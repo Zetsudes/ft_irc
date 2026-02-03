@@ -1,0 +1,148 @@
+commandes obligatoires de base (PASS, NICK, USER, JOIN, PRIVMSG, QUIT, etc.)
+
+ce qu’est un serveur IRC : Un serveur IRC = le “chef d’orchestre” des conversations, qui fait circuler les messages, gère les channels et les droits, et permet aux clients IRC de communiquer entre eux.
+
+la notion de channel : 
+Un channel = un salon de discussion sur le serveur IRC
+- Il a un nom (#nom)
+- Il contient des membres
+- il peut avoir des modes et un topic
+- Certains membres peuvent être opérateurs avec des droits spéciaux
+
+la différence entre client ↔ serveur et client ↔ client (via serveur)
+
+👉 Astuce : testez déjà avec nc ou irssi pour voir comment un vrai serveur répond.
+
+
+
+🧱 2. Base technique du serveur
+
+Objectif : un serveur qui écoute et accepte des connexions
+
+Socket TCP (socket, bind, listen, accept)
+
+Serveur non bloquant
+
+poll() cest top 
+
+Gérer plusieurs clients en même temps
+
+Détecter :
+
+connexion
+
+déconnexion
+
+message reçu
+
+À ce stade :
+✔️ les clients peuvent se connecter
+❌ ils ne se parlent pas encore
+
+👤 3. Gestion des clients
+
+Créer une structure Client :
+
+fd
+
+nickname
+
+username
+
+statut (authentifié ou pas)
+
+buffer de réception
+
+Implémenter :
+
+PASS
+
+NICK
+
+USER
+
+👉 Tant que PASS + NICK + USER pas validés → le client ne peut rien faire.
+
+💬 4. Parsing des commandes
+
+Très important 🔥
+
+Lire ligne par ligne (\r\n)
+
+Parser :
+
+commande
+
+paramètres
+
+Dispatcher vers la bonne fonction
+
+Ex :
+
+PRIVMSG bob :salut bg
+
+🏠 5. Gestion des channels
+
+Créer une structure Channel :
+
+nom (#42)
+
+liste des clients
+
+opérateurs
+
+modes (au minimum ceux demandés)
+
+Implémenter Les commandes opérateur :
+
+JOIN
+
+PART
+
+TOPIC
+
+MODE
+
+KICK 
+
+✉️ 6. Messages
+
+PRIVMSG entre deux clients
+
+PRIVMSG vers un channel
+
+Diffuser correctement à tous les membres concernés
+
+Respecter le format IRC
+
+🧹 7. Gestion des erreurs & cas relous
+
+Nick déjà pris
+
+Commande inconnue
+
+Mauvais nombre d’arguments
+
+Client pas authentifié
+
+Client qui quitte brutalement
+
+🧪 8. Tests intensifs
+
+nc localhost port
+
+irssi
+
+Plusieurs clients en même temps
+
+Tester les erreurs exprès 😈
+
+✨ 9. Bonus (si vous avez la foi)
+
+Bot IRC
+
+Messages automatiques
+
+Logs
+
+Commandes fun

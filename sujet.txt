@@ -1,0 +1,87 @@
+Fonctions 🐐
+
+🌐 Réseau / sockets
+
+socket → crée un socket (point de communication)
+
+close → ferme un fd (socket ou fichier)
+
+setsockopt → configure des options du socket (ex: reuseaddr)
+
+getsockname → récupère l’IP/port local du socket
+
+getprotobyname → récupère un protocole (ex: "tcp")
+
+gethostbyname → résout un nom de domaine (ancien, IPv4)
+
+getaddrinfo → résout IP + port (moderne, IPv4/IPv6)
+
+freeaddrinfo → libère ce que getaddrinfo a alloué
+
+bind → attache un socket à une IP + port
+
+connect → connecte un socket à un serveur
+
+listen → met le socket en attente de connexions
+
+accept → accepte un nouveau client
+
+send → envoie des données
+
+recv → reçoit des données
+
+🔁 Endianness / conversion réseau
+
+htons → short host → network
+
+htonl → long host → network
+
+ntohs → short network → host
+
+ntohl → long network → host
+
+🌍 IP / adresses
+
+inet_addr → IP string → int (ancien)
+
+inet_ntoa → int → IP string (ancien)
+
+inet_ntop → IP binaire → string (moderne)
+
+⏱️ Multiplexing
+
+poll → surveille plusieurs fd (événements I/O) 
+
+⚙️ Signaux
+
+signal → associe un handler à un signal (simple)
+
+sigaction → gestion avancée des signaux
+
+sigemptyset → initialise un set de signaux vide
+
+sigfillset → set avec tous les signaux
+
+sigaddset → ajoute un signal au set
+
+sigdelset → retire un signal du set
+
+sigismember → teste si un signal est dans le set
+
+📁 Fichiers / fd
+
+lseek → déplace le curseur dans un fichier
+
+fstat → infos sur un fd (taille, type…)
+
+fcntl → contrôle d’un fd (non-blocking, flags…)
+
+
+
+
+
+
+Le port doit être : un nombre entre 1024 et 65535
+
+client : irssi ⭐ ou hexchat
+
