@@ -146,3 +146,20 @@ Messages automatiques
 Logs
 
 Commandes fun
+
+
+
+PASS: The PASS command is used to set a 'connection password'.
+NICK: NICK command is used to give user a nickname or change the existing one.
+USER: he USER command is used at the beginning of connection to specify the username, hostname and realname of a new user.
+OPER: A normal user uses the OPER command to obtain operator privileges.
+MODE: The user MODE's are typically changes which affect either how the client is seen by others or what 'extra' messages the client is sent.
+QUIT: A client session is terminated with a quit message.
+JOIN: The JOIN command is used by a user to request to start listening to the specific channel.
+PART: The PART command causes the user sending the message to be removed from the list of active members for all given channels listed in the parameter string.
+TOPIC: The TOPIC command is used to change or view the topic of a channel.
+KICK: The KICK command can be used to request the forced removal of a user from a channel.
+PRIVMSG: PRIVMSG is used to send private messages between users, as well as to send messages to channels.
+NOTICE: The NOTICE command is used similarly to PRIVMSG.
+SENDFILE: The SENDFILE command is used to send a file to another user.
+GETFILE: The GETFILE command is used to receive a file from another user.

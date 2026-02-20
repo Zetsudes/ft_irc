@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:11 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/20 13:17:09 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/20 14:13:14 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,24 @@
 class Client
 {
     private:
-        std::string nickname;
-        std::string username;
-        std::string name;
-    
+        std::string nickName;
+        std::string userName;
+        std::string realName;
+        int socket_fd;
     
     public:
         Client();
         Client(Client const &src);
         Client &operator=(Client const &other);
         ~Client();
+
+        void setNickName(const std::string& str);
+        void setUserName(const std::string& str);
+        void setRealName(const std::string& str);
+
+        std::string getNickName() const;
+        std::string getUserName() const;
+        std::string getRealName() const;
 };
 
 #endif
