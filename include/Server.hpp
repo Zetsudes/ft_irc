@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/20 13:36:03 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/20 14:14:34 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,13 @@
 #include <iostream>
 #include <stdexcept> 
 #include <fcntl.h>
+#include <cerrno>
 
 class Server 
 {
     private:
         std::string password;
+		int server_fd;
 
     public:
         Server();
