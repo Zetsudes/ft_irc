@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/20 13:24:42 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/20 13:31:37 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@ class Server
         Server(Server const &src);
         Server &operator=(Server const &other);
         ~Server();
+
+		void createSocket();
+		void Server::serverLoop();
         
     
 };
