@@ -6,12 +6,11 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/23 12:56:31 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/23 13:04:53 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#pragma once
 
 #include <sys/socket.h>
 #include <netinet/in.h> // pour5 le domaine (AF_INET cest a direr IPv4)
