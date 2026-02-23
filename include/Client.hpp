@@ -18,17 +18,36 @@
 class Client
 {
 	private:
-		int			client_fd;
-		std::string	serverIp;
+		int	client_fd;
+		std::string nickname;
+		std::string username;
+		std::string realname;
+		std::string buffer;
+
+		bool hasNick;
+		bool hasUser;
+		bool registered;
+		// std::string	serverIp;
 
 	public:
 		Client();
-		Client(Client const &src);
-		Client &operator=(Client const &other);
+		Client(int fd);
+		Client(const Client& src);
+		Client &operator=(const Client& other);
 		~Client();
 
-		void	connectToServer();
-		void	authenticate();
-		void	clientLoop();
+		int getFd() const;
+
+		void setNickname(const std::string& nick);
+		void setUsername(const std::string& user);
+		void setRealname(const std::string& real);
+
+		std::string getNickName() const;
+
+		void appendToBuffer(const std::string& data);
+		void clearBuffer();
+
+		bool isRegistered() const;
+		std::string& getBuffer();
 };
 

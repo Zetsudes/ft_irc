@@ -104,3 +104,11 @@ void Server::readClientMessage(int client_fd)
 		send(client_fd, reply.c_str(), reply.size(), 0);
 	}
 }
+
+Client* Server::getClientByFd(int fd)
+{
+    std::map<int, Client>::iterator it = clients.find(fd);
+    if (it != clients.end())
+        return &(it->second);
+    return NULL;
+}

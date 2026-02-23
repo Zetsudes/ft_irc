@@ -16,6 +16,7 @@
 #include <netinet/in.h> // pour5 le domaine (AF_INET cest a direr IPv4)
 #include <sys/types.h> // le type ici sock_stream pour recevoir les messages dans lordre et ne pas perdre une partie du message
 // IPPROTO_TCP  // pour TCP
+#include <map>
 #include <iostream>
 #include <stdexcept>
 #include <fcntl.h>
@@ -24,21 +25,28 @@
 #include <poll.h>
 #include <unistd.h>
 
+class Client;
+class Channel;
+
 class Server
 {
 	private:
-		int					server_fd;
+		int	server_fd;
 		std::vector<pollfd>	connections;
 
+		std::map<int, Client> clients;
+		std::map<std::string, Channel> channels;
 	public:
 		Server();
-		Server(Server const &src);
-		Server &operator=(Server const &other);
+		Server(const Server& src);
+		Server &operator=(const Server& other);
 		~Server();
 
 		void	createSocket();
 		void	serverLoop();
 		void	acceptNewClient();
 		void	readClientMessage(int client_fd);
+
+		Client* getClientByFd(int fd);
 };
 
