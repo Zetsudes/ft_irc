@@ -3,25 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:11 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/20 13:17:09 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/23 13:44:25 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#pragma once
 
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <arpa/inet.h>
-#include <poll.h>
-#include <csignal.h>
+#include <iostream>
 
 class Client
 {
@@ -29,13 +21,16 @@ class Client
         std::string nickname;
         std::string username;
         std::string name;
-    
-    
+		int client_fd;
+
+
     public:
         Client();
         Client(Client const &src);
         Client &operator=(Client const &other);
         ~Client();
+
+		void connectToServer();
+		
 };
 
-#endif
