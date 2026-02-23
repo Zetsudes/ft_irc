@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/23 13:04:53 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/23 13:17:23 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 class Server
 {
 	private:
-		std::string password;
+		std::string password; // pourquoi ?
 		int server_fd;
 		std::vector<pollfd> connections;
 

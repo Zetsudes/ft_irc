@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+//ajouter constructeurs etc..
+
 void Server::createSocket()
 {
 	server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
