@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/23 13:30:26 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/23 15:51:50 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 class Server
 {
 	private:
-		int server_fd;
-		std::vector<pollfd> connections;
+		int					server_fd;
+		std::vector<pollfd>	connections;
 
 	public:
 		Server();
@@ -36,9 +36,9 @@ class Server
 		Server &operator=(Server const &other);
 		~Server();
 
-		void createSocket();
-		void serverLoop();
-		void acceptNewClient();
-		void readClientMessage(int client_fd);
+		void	createSocket();
+		void	serverLoop();
+		void	acceptNewClient();
+		void	readClientMessage(int client_fd);
 };
 
