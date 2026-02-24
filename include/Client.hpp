@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:11 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/23 15:51:29 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/24 12:03:29 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,36 +18,31 @@
 class Client
 {
 	private:
-		int	client_fd;
-		std::string nickname;
-		std::string username;
-		std::string realname;
-		std::string buffer;
-
-		bool hasNick;
-		bool hasUser;
-		bool registered;
-		// std::string	serverIp;
+		int	_client_fd;
+		std::string _nickname;
+		std::string _username;
+		std::string _realname;
+		std::string _buffer;
+		bool _registered;
 
 	public:
-		Client();
 		Client(int fd);
-		Client(const Client& src);
-		Client &operator=(const Client& other);
 		~Client();
 
 		int getFd() const;
+		std::string& getBuffer();
+		std::string getNickname() const;
+		std::string getUsername() const;
+		std::string getRealname() const;
 
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
 		void setRealname(const std::string& real);
 
-		std::string getNickName() const;
-
 		void appendToBuffer(const std::string& data);
 		void clearBuffer();
+		void tryRegister();
 
 		bool isRegistered() const;
-		std::string& getBuffer();
 };
 

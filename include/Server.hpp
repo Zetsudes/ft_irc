@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/23 15:51:50 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/24 15:04:08 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,21 +32,26 @@ class Server
 {
 	private:
 		int	server_fd;
+		int _port;
+		std::string _passsword;
+		
 		std::vector<pollfd>	connections;
-
 		std::map<int, Client> clients;
 		std::map<std::string, Channel> channels;
+		
 	public:
-		Server();
-		Server(const Server& src);
-		Server &operator=(const Server& other);
+		Server(int port, const std::string& password);
 		~Server();
 
+		Client* getClientByFd(int fd);
+		Client* getClientByNick(const std::string& nick);
+		Channel* getChannel(const std::string& name);
+		
 		void	createSocket();
 		void	serverLoop();
 		void	acceptNewClient();
 		void	readClientMessage(int client_fd);
 
-		Client* getClientByFd(int fd);
+		void removeClient(int fd);
 };
 

@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/23 13:25:34 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/24 15:11:58 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "../include/Server.hpp"
+#include "../include/Client.hpp"
+#include "../include/Channel.hpp"
 
 //ajouter constructeurs etc..
 
@@ -110,5 +112,24 @@ Client* Server::getClientByFd(int fd)
     std::map<int, Client>::iterator it = clients.find(fd);
     if (it != clients.end())
         return &(it->second);
+    return NULL;
+}
+
+Client* Server::getClientByFd(int fd)
+{
+    std::map<int, Client>::iterator it = clients.find(fd);
+    if (it != clients.end())
+        return &(it->second);
+    return NULL;
+}
+
+Client* Server::getClientByNickname(const std::string& nick)
+{
+    std::map<int, Client>::iterator it;
+    for (it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->second.getNickName() == nick)
+            return &(it->second);
+    }
     return NULL;
 }
