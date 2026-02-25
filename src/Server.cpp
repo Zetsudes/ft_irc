@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/24 15:11:58 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/25 14:22:52 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
+#include "../include/Command.hpp"
 
 //ajouter constructeurs etc..
 
@@ -55,7 +56,7 @@ void Server::serverLoop()
 				if (connections[i].fd == server_fd)
 					acceptNewClient();
 				else
-					readClientMessage(connections[i].fd);
+					readClientMessage(connections[i].fd); // + parse
 			}
 		}
 	}
@@ -102,8 +103,10 @@ void Server::readClientMessage(int client_fd)
 	}
 	else
 	{
-		std::string reply = "Message received!\r\n";
-		send(client_fd, reply.c_str(), reply.size(), 0);
+		std::string line(buffer, bytesRead);
+		if (!line.empty() && (line.back() == '\n' || line.back() == '\r'))
+			line.erase(line.find_last_not_of("\r\n") + 1);
+		Command cmd = Command::parse(line);
 	}
 }
 
