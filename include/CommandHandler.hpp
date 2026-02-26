@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:54:05 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 11:28:46 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 14:13:01 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,23 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Parsing.hpp"
+
+// NICK/USER errors
+#define ERR_NONICKNAMEGIVEN "431"
+#define ERR_NICKNAMEINUSE   "433"    // Nickname is already in use
+#define ERR_NEEDMOREPARAMS  "461"    // Not enough parameters
+#define ERR_ALREADYREGISTRED "462"   // You may not reregister
+#define ERR_PASSWDMISMATCH  "464"    // Password incorrect
+#define ERR_NOTREGISTERED   "451"    // You have not registered
+
+// Channel errors
+#define ERR_NOSUCHCHANNEL   "403"    // No such channel
+#define ERR_CHANOPRIVSNEEDED "482"  // You're not channel operator
+
+// Message errors
+#define ERR_CANNOTSENDTOCHAN "404"
+#define ERR_TOOMANYTARGETS  "407"
+
 
 class CommandHandler
 {
