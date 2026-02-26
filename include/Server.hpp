@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/26 10:23:19 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/26 13:04:03 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Server
 		Client* getClientByFd(int fd);
 		Client* getClientByNickname(const std::string& nick);
 		Channel* getChannel(const std::string& name);
+		const std::string& getPassword() const;
 		
 		void	createSocket();
 		void	serverLoop();

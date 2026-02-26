@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 10:52:09 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 13:04:57 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,10 @@ void Server::acceptNewClient()
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break;
 			else
-				throw std::runtime_error("accept() failed");
+				throw std::runtime_error("Error: accept() failed");
 		}
 		if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
-            throw std::runtime_error("Failed to set client non-blocking"); 
+            throw std::runtime_error("Error: Failed to set client non-blocking"); 
 		pollfd clientPoll;
 		clientPoll.fd = client_fd;
 		clientPoll.events = POLLIN;
@@ -152,4 +152,8 @@ Client* Server::getClientByNickname(const std::string& nick)
             return &(it->second);
     }
     return NULL;
+}
+
+const std::string& Server::getPassword() const { 
+	return _password;
 }
