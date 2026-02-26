@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command.cpp                                        :+:      :+:    :+:   */
+/*   Parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:48:26 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 10:23:50 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:51:16 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Command.hpp"
+#include "../include/Parsing.hpp"
 
 //constructeur
 
-Command Command::parse(const std::string& line) {
-	Command cmd;
+Parsing Parsing::parse(const std::string& line) {
+	Parsing parse;
 	size_t start = 0;
 	size_t delimiterPos = 0;
 	size_t len = line.length();
@@ -23,34 +23,34 @@ Command Command::parse(const std::string& line) {
 	if (!line.empty() && line[0] == ':') {
 		delimiterPos = line.find(' ', start);
 		if (delimiterPos != std::string::npos) {
-			cmd.author = line.substr(1, delimiterPos - 1);
+			parse.author = line.substr(1, delimiterPos - 1);
 			start = delimiterPos + 1;
 		} else {
-			cmd.author = line.substr(1);
-			return cmd;
+			parse.author = line.substr(1);
+			return parse;
 		}
 	}
 	delimiterPos = line.find(' ', start);
 	if (delimiterPos != std::string::npos) {
-		cmd.request = line.substr(start, delimiterPos - start);
+		parse.request = line.substr(start, delimiterPos - start);
 		start = delimiterPos + 1;
 	} else {
-		cmd.request = line.substr(start);
-		return cmd;
+		parse.request = line.substr(start);
+		return parse;
 	}
 	while (start < len) {
 		if (line[start] == ':') {
-			cmd.params.push_back(line.substr(start + 1));
+			parse.params.push_back(line.substr(start + 1));
 			break;
 		}
 		delimiterPos = line.find(' ', start);
 		if (delimiterPos != std::string::npos) {
-			cmd.params.push_back(line.substr(start, delimiterPos - start));
+			parse.params.push_back(line.substr(start, delimiterPos - start));
 			start = delimiterPos + 1;
 		} else {
-			cmd.params.push_back(line.substr(start));
+			parse.params.push_back(line.substr(start));
 			break;
 		}
 	}
-	return cmd;
+	return parse;
 }

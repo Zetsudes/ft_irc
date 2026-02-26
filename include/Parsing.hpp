@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-class Command {
+class Parsing {
 	public:
 		std::string author;
 		std::string request;
 		std::vector<std::string> params;
 
-		Command() {}
-		~Command() {}
+		Parsing() {}
+		~Parsing() {}
 
-		static Command parse(const std::string& line);
+		static Parsing parse(const std::string& line);
 };

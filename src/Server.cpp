@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 10:20:05 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:52:09 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
-#include "../include/Command.hpp"
+#include "../include/Parsing.hpp"
 
 Server::Server(int port, const std::string& password)
     : _port(port), _password(password)
@@ -131,7 +131,7 @@ void Server::readClientMessage(int client_fd)
 		while (!line.empty() && (line[line.length() - 1] == '\n' || line[line.length() - 1] == '\r'))
     		line.erase(line.length() - 1);
 		 std::cout << "Received from " << client_fd << ": " << line << std::endl;
-		Command cmd = Command::parse(line);
+		Parsing parse = Parsing::parse(line);
 	}
 }
 
