@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:48:26 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/25 12:21:46 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:23:50 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Command.hpp"
+#include "../include/Command.hpp"
 
 //constructeur
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/25 14:22:52 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:20:05 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,16 @@
 #include "../include/Channel.hpp"
 #include "../include/Command.hpp"
 
-//ajouter constructeurs etc..
+Server::Server(int port, const std::string& password)
+    : _port(port), _password(password)
+{
+    createSocket();
+}
+
+Server::~Server()
+{
+    close(server_fd);
+}
 
 void Server::createSocket()
 {
@@ -28,9 +37,10 @@ void Server::createSocket()
 	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuseOptionOn, sizeof(reuseOptionOn)) == -1)
 		throw std::runtime_error("Error: Failed to set socket options");
 
-	struct sockaddr_in server_address = {0};
+	struct sockaddr_in server_address;
+	std::memset(&server_address, 0, sizeof(server_address));
 	server_address.sin_family = AF_INET;
-	server_address.sin_port = htons(6667);
+	server_address.sin_port = htons(this->_port);
 	server_address.sin_addr.s_addr = INADDR_ANY;
 
 	if(bind(server_fd, (struct sockaddr*)&server_address, sizeof(server_address)) < 0)
@@ -41,6 +51,14 @@ void Server::createSocket()
 
 	if(fcntl(server_fd, F_SETFL, O_NONBLOCK) < 0)
 		throw std::runtime_error("Error: Failed to set socket options");
+
+	pollfd serverPoll;
+    serverPoll.fd = server_fd;
+    serverPoll.events = POLLIN;
+    serverPoll.revents = 0;
+    connections.push_back(serverPoll);
+
+    std::cout << "Server listening on port " << _port << std::endl;
 }
 
 void Server::serverLoop()
@@ -76,11 +94,14 @@ void Server::acceptNewClient()
 			else
 				throw std::runtime_error("accept() failed");
 		}
-		fcntl(client_fd, F_SETFL, O_NONBLOCK); pollfd clientPoll;
+		if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
+            throw std::runtime_error("Failed to set client non-blocking"); 
+		pollfd clientPoll;
 		clientPoll.fd = client_fd;
 		clientPoll.events = POLLIN;
 		clientPoll.revents = 0;
 		connections.push_back(clientPoll);
+		clients.insert(std::make_pair(client_fd, Client(client_fd)));
 		std::cout << "New client connected: " << client_fd << std::endl;
 	}
 }
@@ -91,6 +112,7 @@ void Server::readClientMessage(int client_fd)
 	int bytesRead = recv(client_fd, buffer, sizeof(buffer), 0);
 	if (bytesRead <= 0)
 	{
+		std::cout << "Client disconnected: " << client_fd << std::endl;
 		close(client_fd);
 		for (size_t i = 0; i < connections.size(); i++)
 		{
@@ -100,22 +122,17 @@ void Server::readClientMessage(int client_fd)
 				break;
 			}
 		}
+		clients.erase(client_fd);
+        return;
 	}
 	else
 	{
 		std::string line(buffer, bytesRead);
-		if (!line.empty() && (line.back() == '\n' || line.back() == '\r'))
-			line.erase(line.find_last_not_of("\r\n") + 1);
+		while (!line.empty() && (line[line.length() - 1] == '\n' || line[line.length() - 1] == '\r'))
+    		line.erase(line.length() - 1);
+		 std::cout << "Received from " << client_fd << ": " << line << std::endl;
 		Command cmd = Command::parse(line);
 	}
-}
-
-Client* Server::getClientByFd(int fd)
-{
-    std::map<int, Client>::iterator it = clients.find(fd);
-    if (it != clients.end())
-        return &(it->second);
-    return NULL;
 }
 
 Client* Server::getClientByFd(int fd)
@@ -131,7 +148,7 @@ Client* Server::getClientByNickname(const std::string& nick)
     std::map<int, Client>::iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)
     {
-        if (it->second.getNickName() == nick)
+        if (it->second.getNickname() == nick)
             return &(it->second);
     }
     return NULL;

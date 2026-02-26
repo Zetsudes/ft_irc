@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/24 15:04:08 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:23:19 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 #include <vector>
 #include <poll.h>
 #include <unistd.h>
+#include <cstring>
+#include <cstdlib> 
 
 class Client;
 class Channel;
@@ -33,7 +35,7 @@ class Server
 	private:
 		int	server_fd;
 		int _port;
-		std::string _passsword;
+		std::string _password;
 		
 		std::vector<pollfd>	connections;
 		std::map<int, Client> clients;
@@ -44,7 +46,7 @@ class Server
 		~Server();
 
 		Client* getClientByFd(int fd);
-		Client* getClientByNick(const std::string& nick);
+		Client* getClientByNickname(const std::string& nick);
 		Channel* getChannel(const std::string& name);
 		
 		void	createSocket();

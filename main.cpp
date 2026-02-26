@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:37 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/24 14:16:29 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/02/26 10:16:28 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,46 +14,27 @@
 #include "include/Channel.hpp"
 #include "include/Server.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-	//int port = std::atoi(av[1]);
-	std::cout << " <3 Client Class <3" << std::endl << std::endl;
-	Client c(42);
-    std::cout << "Registered? " << c.isRegistered() << std::endl;
+	if (argc != 3)
+    {
+        std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
+        return 1;
+    }
 
-    c.setNickname("le z");
-    std::cout << "Registered after nick: " << c.isRegistered() << std::endl;
+    int port = std::atoi(argv[1]);
+    std::string password = argv[2];
 
-    c.setUsername("kangoojuniordu06");
-    std::cout << "Registered after username: " << c.isRegistered() << std::endl;
-
-    c.setRealname("zai");
-    std::cout << "Buffer before append: " << c.getBuffer() << std::endl;
-
-    c.appendToBuffer("Rendez-vous tous a school island on vous attend sur l'ile du bonheeuuuuurrrrrrr");
-    std::cout << "Buffer after append: " << c.getBuffer() << std::endl;
-
-	std::cout << "Fd : " <<  c.getFd() << std::endl;
-	std::cout << "Realname: " << c.getRealname() << std::endl;
-	std::cout << "Nickname: " << c.getNickname() << std::endl;
-	std::cout << "Username: " << c.getUsername() << std::endl;
-
-    c.clearBuffer();
-    std::cout << "Buffer after clear: " << c.getBuffer() << std::endl << std::endl;
-
-	std::cout << " <3 Channel Class <3" << std::endl << std::endl;
-	Channel chanchan("mychannel");
-	Client Corneil(1), Bernie(2);
-
-	chanchan.addClient(&Corneil);
-	chanchan.addClient(&Bernie);
-	chanchan.addOperator(&Corneil);
-
-	std::cout << "Members: " << chanchan.memberCount() << std::endl;  
-	std::cout << "Operators: " << chanchan.operatorCount() << std::endl;
-
-	chanchan.removeOperator(&Corneil);
-	std::cout << "Operators after Corneil died :( : " << chanchan.operatorCount() << std::endl;
+    try
+    {
+        Server server(port, password);
+        server.serverLoop(); 
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }
