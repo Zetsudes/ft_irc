@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 14:12:45 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 14:47:06 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,31 +18,31 @@ CommandHandler::~CommandHandler() {};
 void	CommandHandler::handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
-		std::string msg = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
-		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		std::string errorMsg = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
+		send(clientInfo.getFd(), errorMsg .c_str(), errorMsg .size(), 0);
 		return;
 	}
 	std::string pwd = parsedCmd.params[0];
 	if (pwd == serverInfo.getPassword()) {
 		clientInfo.tryRegister();  
 	} else {
-		std::string msg = ERR_PASSWDMISMATCH;
-		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		std::string errorMsg = std::string(ERR_PASSWDMISMATCH) + " :Password incorrect\r\n";
+		send(clientInfo.getFd(), errorMsg .c_str(), errorMsg.size(), 0);
 	}
 }
 	
 void	CommandHandler::handleNick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
-		std::string msg =ERR_NONICKNAMEGIVEN;
-		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		std::string errorMsg  = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
+		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
 	std::string nickname = parsedCmd.params[0];
 	Client* other = serverInfo.getClientByNickname(nickname);
    	if (other && other != &clientInfo) {
-		std::string msg = ERR_NICKNAMEINUSE;
-		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		std::string errorMsg = std::string(ERR_NICKNAMEINUSE) + " :Nickname is already in use\r\n";
+		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
     }
 	clientInfo.setNickname(nickname);
@@ -51,8 +51,8 @@ void	CommandHandler::handleNick(Server& serverInfo, Client& clientInfo, const Pa
 
 void	CommandHandler::handleUser(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 	if (parsedCmd.params.size() < 4) {
-		std::string msg = ERR_NEEDMOREPARAMS; 
-		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n"; 
+		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
 	std::string username = parsedCmd.params[0];
@@ -64,8 +64,21 @@ void	CommandHandler::handleUser(Server& serverInfo, Client& clientInfo, const Pa
 	clientInfo.tryRegister();
 }
 
-void	CommandHandler::handlePrivmsg(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
-	
+void CommandHandler::handlePrivmsg(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+	if (parsedCmd.params.size() < 2) {
+		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";
+		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		return;
+	}
+	std::string userDest = parsedCmd.params[0];
+	std::string msg = parsedCmd.params[1];
+	if (!serverInfo.getClientByNickname(userDest)) {
+		std::string errorMsg = std::string(ERR_NOSUCHNICK) + " " + userDest + " :No such nick/channel\r\n";
+		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		return;
+	}
+	std::string msgToSend = ":" + clientInfo.getNickname() + " PRIVMSG " + userDest + " :" + msg + "\r\n";
+	send(serverInfo.getClientByNickname(userDest)->getFd(), msgToSend.c_str(), msgToSend.size(), 0);
 }
 
 void	CommandHandler::handleJoin(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
