@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 13:05:16 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/02/26 13:33:22 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,35 @@ CommandHandler::~CommandHandler() {};
 void	CommandHandler::handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
-		std::string msg = "Error :Password incorrect\r\n";
+		std::string msg = "Error: Password incorrect\r\n";
 		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
 		return;
 	}
 	std::string pwd = parsedCmd.params[0];
-    if (pwd == serverInfo.getPassword()) {
-        clientInfo.tryRegister();  
-    } else {
-        std::string msg = "Error :Password incorrect\r\n";
-        send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
-    }
+	if (pwd == serverInfo.getPassword()) {
+		clientInfo.tryRegister();  
+	} else {
+		std::string msg = "Error: Password incorrect\r\n";
+		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+	}
 }
 	
 void	CommandHandler::handleNick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
-	
+	if (parsedCmd.params.empty())
+	{
+		std::string msg = "Error: No nickname\r\n";
+		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	std::string nickname = parsedCmd.params[0];
+	Client* other = serverInfo.getClientByNickname(nickname);
+   	if (other && other != &clientInfo) {
+		std::string msg = "Error: Nickname is already in use\r\n";
+		send(clientInfo.getFd(), msg.c_str(), msg.size(), 0);
+		return;
+    }
+	clientInfo.setNickname(nickname);
+	clientInfo.tryRegister();
 }
 
 void	CommandHandler::handleUser(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
