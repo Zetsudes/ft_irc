@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 13:04:57 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/02 11:28:38 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void Server::acceptNewClient()
 				throw std::runtime_error("Error: accept() failed");
 		}
 		if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
-            throw std::runtime_error("Error: Failed to set client non-blocking"); 
+            throw std::runtime_error("Error: Failed to set client non-blocking");
 		pollfd clientPoll;
 		clientPoll.fd = client_fd;
 		clientPoll.events = POLLIN;
@@ -123,13 +123,13 @@ void Server::readClientMessage(int client_fd)
 			}
 		}
 		clients.erase(client_fd);
-        return;
+		return;
 	}
 	else
 	{
 		std::string line(buffer, bytesRead);
 		while (!line.empty() && (line[line.length() - 1] == '\n' || line[line.length() - 1] == '\r'))
-    		line.erase(line.length() - 1);
+			line.erase(line.length() - 1);
 		 std::cout << "Received from " << client_fd << ": " << line << std::endl;
 		Parsing parse = Parsing::parse(line);
 	}
@@ -154,6 +154,34 @@ Client* Server::getClientByNickname(const std::string& nick)
     return NULL;
 }
 
-const std::string& Server::getPassword() const { 
+const std::string& Server::getPassword() const {
 	return _password;
 }
+
+void Server::announceQuit(Client& client, const std::string& reason)
+{
+	std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
+	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		if (it->first != client.getFd())
+			send(it->first, msg.c_str(), msg.size(), 0);
+	}
+}
+
+void Server::removeClient(int fd)
+{
+	Client* client = getClientByFd(fd);
+	if (!client)
+		return;
+	for (size_t i = 0; i < connections.size(); i++)
+	{
+		if (connections[i].fd == fd)
+		{
+			connections.erase(connections.begin() + i);
+			break;
+		}
+	}
+	close(fd);
+	clients.erase(fd);
+}
+
