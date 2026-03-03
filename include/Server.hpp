@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/03/02 11:28:59 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/03 14:14:51 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 
 class Client;
 class Channel;
+class CommandHandler;
 
 class Server
 {
@@ -40,6 +41,7 @@ class Server
 		std::vector<pollfd>	connections;
 		std::map<int, Client> clients;
 		std::map<std::string, Channel> channels;
+		CommandHandler _cmdHandler;
 
 	public:
 		Server(int port, const std::string& password);

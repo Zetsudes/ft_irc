@@ -15,11 +15,8 @@ In ft_irc, the architecture is strictly client–server.
 Each IRC client connects to the IRC server, sends commands, and receives responses. Clients never communicate directly with each other.
 All messages go through the server.
 
-
-### Usage Examples
-To use the server :
-
-
 ### Testing with IRC Clients
-nc localhost port / irssi
+nc localhost port 
+irssi
+Hexchat
 
