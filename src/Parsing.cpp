@@ -6,13 +6,47 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:48:26 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 10:51:16 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/03 14:50:34 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Parsing.hpp"
 
 //constructeur
+
+
+/* Gestion des erreurs & cas relous = 
+
+Nick déjà pris
+
+Commande inconnue
+
+Mauvais nombre d’arguments
+
+Client pas authentifié
+
+Client qui quitte brutalement*/
+
+bool Parsing::isNickUsed() {
+
+}
+
+bool Parsing::IsValidCommand() {
+
+}
+
+bool Parsing::hasEnoughParams() {
+	
+}
+
+bool Parsing::isAuthenticated() {
+	
+}
+
+bool Parsing::isClientDisconnected() {
+	
+}
+
 
 Parsing Parsing::parse(const std::string& line) {
 	Parsing parse;
@@ -54,3 +88,4 @@ Parsing Parsing::parse(const std::string& line) {
 	}
 	return parse;
 }
+
