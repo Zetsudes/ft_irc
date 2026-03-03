@@ -6,13 +6,13 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/02 14:51:01 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/03 10:41:08 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "../include/CommandHandler.hpp"
 
-CommandHandler::CommandHandler() {}
+CommandHandler::CommandHandler() {};
 CommandHandler::~CommandHandler() {};
 
 void	CommandHandler::handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
@@ -50,6 +50,7 @@ void	CommandHandler::handleNick(Server& serverInfo, Client& clientInfo, const Pa
 }
 
 void	CommandHandler::handleUser(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+	(void)serverInfo;
 	if (parsedCmd.params.size() < 4) {
 		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";
 		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
@@ -81,7 +82,7 @@ void CommandHandler::handlePrivmsg(Server& serverInfo, Client& clientInfo, const
 	send(serverInfo.getClientByNickname(userDest)->getFd(), msgToSend.c_str(), msgToSend.size(), 0);
 }
 
-void	CommandHandler::handleJoin(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+/*void	CommandHandler::handleJoin(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 
 }
 
@@ -95,7 +96,7 @@ void	CommandHandler::handleTopic(Server& serverInfo, Client& clientInfo, const P
 
 void	CommandHandler::handleKick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 
-}
+}*/
 
 void	CommandHandler::handleQuit(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
 	std::string reason;

@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:54:05 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/02 11:32:47 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/03 10:41:54 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@
 class CommandHandler
 {
 	public:
-		CommandHandler() {};
-		~CommandHandler() {};
+		CommandHandler();
+		~CommandHandler();
 
 		//Authentification
 		void	handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //indiquer le mot de passe

@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/02 11:28:38 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/03 10:43:06 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void Server::serverLoop()
 				if (connections[i].fd == server_fd)
 					acceptNewClient();
 				else
-					readClientMessage(connections[i].fd); // + parse
+					readClientMessage(connections[i].fd);
 			}
 		}
 	}
