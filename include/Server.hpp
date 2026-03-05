@@ -6,11 +6,16 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:07 by zamohame          #+#    #+#             */
-/*   Updated: 2026/03/03 14:14:51 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:43:05 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+#include "../include/Client.hpp"
+#include "../include/Channel.hpp"
+#include "../include/Parsing.hpp"
+#include "../include/CommandHandler.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h> // pour5 le domaine (AF_INET cest a direr IPv4)
@@ -41,7 +46,6 @@ class Server
 		std::vector<pollfd>	connections;
 		std::map<int, Client> clients;
 		std::map<std::string, Channel> channels;
-		CommandHandler _cmdHandler;
 
 	public:
 		Server(int port, const std::string& password);

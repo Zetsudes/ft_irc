@@ -6,16 +6,11 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:54:05 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/05 11:02:24 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:40:08 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-
-#include "../include/Server.hpp"
-#include "../include/Client.hpp"
-#include "../include/Parsing.hpp"
-#include "../include/Channel.hpp"
 
 //Authentification errors
 #define ERR_NONICKNAMEGIVEN		"431"
@@ -27,6 +22,10 @@
 // Channel errors
 #define ERR_NOSUCHCHANNEL   "403"    // No such channel
 #define ERR_CHANOPRIVSNEEDED "482"  // You're not channel operator
+
+class Server;
+class Client;
+class Parsing;
 
 class CommandHandler
 {
@@ -54,4 +53,5 @@ class CommandHandler
 
 		//Déconnexion
 		void	handleQuit(const Parsing& parsedCmd); // permez de quitter IRC
+
 };

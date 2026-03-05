@@ -6,11 +6,15 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/05 11:03:48 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:39:36 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CommandHandler.hpp"
+#include "../include/Server.hpp"
+#include "../include/Client.hpp"
+#include "../include/Parsing.hpp"
+#include "../include/Channel.hpp"
 
 CommandHandler::CommandHandler(Server& server, Client& client) : _server(server), _client(client) {};
 CommandHandler::~CommandHandler() {};

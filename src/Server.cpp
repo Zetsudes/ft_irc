@@ -6,15 +6,12 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:25:33 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/03 14:16:07 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:46:13 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
-#include "../include/Client.hpp"
-#include "../include/Channel.hpp"
-#include "../include/Parsing.hpp"
-#include "../include/CommandHandler.hpp"
+
 
 Server::Server(int port, const std::string& password)
     : _port(port), _password(password)
@@ -136,17 +133,18 @@ void Server::readClientMessage(int client_fd)
 		Client* client = getClientByFd(client_fd);
 		if (client)
 		{
+			CommandHandler handler(*this, *client);
 			std::string cmd = parse.request;
 			if (cmd == "PASS")
-				this->_cmdHandler.handlePass(*this, *client, parse);
+				handler.handlePass(parse);
 			else if (cmd == "NICK")
-				this->_cmdHandler.handleNick(*this, *client, parse);
+				handler.handleNick(parse);
 			else if (cmd == "USER")
-				this->_cmdHandler.handleUser(*this, *client, parse);
+				handler.handleUser(parse);
 			else if (cmd == "PRIVMSG")
-				this->_cmdHandler.handlePrivmsg(*this, *client, parse);
+				handler.handlePrivmsg(parse);
 			else if (cmd == "QUIT")
-				this->_cmdHandler.handleQuit(*this, *client, parse);
+				handler.handleQuit(parse);
 			// JOIN, PART, TOPIC, KICK,...
 		}
 	}

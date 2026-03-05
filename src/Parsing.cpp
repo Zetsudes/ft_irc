@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:48:26 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/03 14:50:34 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:46:48 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ Client pas authentifié
 
 Client qui quitte brutalement*/
 
-bool Parsing::isNickUsed() {
+/*bool Parsing::isNickUsed() {
 
 }
 
@@ -45,7 +45,7 @@ bool Parsing::isAuthenticated() {
 
 bool Parsing::isClientDisconnected() {
 	
-}
+}*/
 
 
 Parsing Parsing::parse(const std::string& line) {
