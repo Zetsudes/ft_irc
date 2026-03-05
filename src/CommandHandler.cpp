@@ -6,105 +6,105 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/03 10:41:08 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:03:48 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CommandHandler.hpp"
 
-CommandHandler::CommandHandler() {};
+CommandHandler::CommandHandler(Server& server, Client& client) : _server(server), _client(client) {};
 CommandHandler::~CommandHandler() {};
 
-void	CommandHandler::handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void	CommandHandler::handlePass(const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
 		std::string errorMsg = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
-		send(clientInfo.getFd(), errorMsg .c_str(), errorMsg .size(), 0);
+		send(_client.getFd(), errorMsg .c_str(), errorMsg .size(), 0);
 		return;
 	}
 	std::string pwd = parsedCmd.params[0];
-	if (pwd == serverInfo.getPassword()) {
-		clientInfo.tryRegister();
+	if (pwd == _server.getPassword()) {
+		_client.tryRegister();
 	} else {
 		std::string errorMsg = std::string(ERR_PASSWDMISMATCH) + " :Password incorrect\r\n";
-		send(clientInfo.getFd(), errorMsg .c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg .c_str(), errorMsg.size(), 0);
 	}
 }
 
-void	CommandHandler::handleNick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void	CommandHandler::handleNick(const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
 		std::string errorMsg  = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
-		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
 	std::string nickname = parsedCmd.params[0];
-	Client* other = serverInfo.getClientByNickname(nickname);
-   	if (other && other != &clientInfo) {
+	Client* other = _server.getClientByNickname(nickname);
+   	if (other && other != &_client) {
 		std::string errorMsg = std::string(ERR_NICKNAMEINUSE) + " :Nickname is already in use\r\n";
-		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
     }
-	clientInfo.setNickname(nickname);
-	clientInfo.tryRegister();
+	_client.setNickname(nickname);
+	_client.tryRegister();
 }
 
-void	CommandHandler::handleUser(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
-	(void)serverInfo;
+void	CommandHandler::handleUser(const Parsing& parsedCmd) {
+	(void)_server;
 	if (parsedCmd.params.size() < 4) {
 		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";
-		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
 	std::string username = parsedCmd.params[0];
 	std::string hostname = parsedCmd.params[1];
 	std::string servername = parsedCmd.params[2];
     std::string realname = parsedCmd.params[3];
-    clientInfo.setUsername(username);
-    clientInfo.setRealname(realname);
-	clientInfo.tryRegister();
+    _client.setUsername(username);
+    _client.setRealname(realname);
+	_client.tryRegister();
 }
 
-void CommandHandler::handlePrivmsg(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void CommandHandler::handlePrivmsg(const Parsing& parsedCmd) {
 	if (parsedCmd.params.size() < 2) {
 		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";
-		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
 	std::string userDest = parsedCmd.params[0];
 	std::string msg = parsedCmd.params[1];
-	if (!serverInfo.getClientByNickname(userDest)) {
+	if (!_server.getClientByNickname(userDest)) {
 		std::string errorMsg = std::string(ERR_NOSUCHNICK) + " " + userDest + " :No such nick/channel\r\n";
-		send(clientInfo.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
+		send(_client.getFd(), errorMsg.c_str(), errorMsg.size(), 0);
 		return;
 	}
-	std::string msgToSend = ":" + clientInfo.getNickname() + " PRIVMSG " + userDest + " :" + msg + "\r\n";
-	send(serverInfo.getClientByNickname(userDest)->getFd(), msgToSend.c_str(), msgToSend.size(), 0);
+	std::string msgToSend = ":" + _client.getNickname() + " PRIVMSG " + userDest + " :" + msg + "\r\n";
+	send(_server.getClientByNickname(userDest)->getFd(), msgToSend.c_str(), msgToSend.size(), 0);
 }
 
-/*void	CommandHandler::handleJoin(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
-
-}
-
-void	CommandHandler::handlePart(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+/*void	CommandHandler::handleJoin(const Parsing& parsedCmd) {
 
 }
 
-void	CommandHandler::handleTopic(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void	CommandHandler::handlePart(const Parsing& parsedCmd) {
 
 }
 
-void	CommandHandler::handleKick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void	CommandHandler::handleTopic(const Parsing& parsedCmd) {
+
+}
+
+void	CommandHandler::handleKick(const Parsing& parsedCmd) {
 
 }*/
 
-void	CommandHandler::handleQuit(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd) {
+void	CommandHandler::handleQuit(const Parsing& parsedCmd) {
 	std::string reason;
 	if (parsedCmd.params.empty()) {
 		reason = "Client quit";
 	} else {
 		reason = parsedCmd.params[0];
 	}
-	serverInfo.announceQuit(clientInfo, reason);
-	serverInfo.removeClient(clientInfo.getFd());
+	_server.announceQuit(_client, reason);
+	_server.removeClient(_client.getFd());
 }

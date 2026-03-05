@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:54:05 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/03 10:41:54 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/05 11:02:24 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,28 @@
 
 class CommandHandler
 {
+	private: 
+		Server& _server;
+		Client& _client;
+
 	public:
-		CommandHandler();
+		CommandHandler(Server& server, Client& client);
 		~CommandHandler();
 
 		//Authentification
-		void	handlePass(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //indiquer le mot de passe
-		void	handleNick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet de changer de nickname
-		void	handleUser(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd);
+		void	handlePass(const Parsing& parsedCmd); //indiquer le mot de passe
+		void	handleNick(const Parsing& parsedCmd); //permet de changer de nickname
+		void	handleUser(const Parsing& parsedCmd);
 
 		//Messages
-		void	handlePrivmsg(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet d'envoyer un message en privé à un utilisateur
+		void	handlePrivmsg(const Parsing& parsedCmd); //permet d'envoyer un message en privé à un utilisateur
 
 		//Channels
-		void	handleJoin(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet d'aller sur un channel
-		void	handlePart(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet de partir d'un ou de plusieurs channels
-		void	handleTopic(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet de changer le topic du channel (titre d'un maximum de 80 caractères)
-		void	handleKick(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); //permet de virer quelqu'un du channel
+		void	handleJoin(const Parsing& parsedCmd); //permet d'aller sur un channel
+		void	handlePart(const Parsing& parsedCmd); //permet de partir d'un ou de plusieurs channels
+		void	handleTopic(const Parsing& parsedCmd); //permet de changer le topic du channel (titre d'un maximum de 80 caractères)
+		void	handleKick(const Parsing& parsedCmd); //permet de virer quelqu'un du channel
 
 		//Déconnexion
-		void	handleQuit(Server& serverInfo, Client& clientInfo, const Parsing& parsedCmd); // permez de quitter IRC
+		void	handleQuit(const Parsing& parsedCmd); // permez de quitter IRC
 };
