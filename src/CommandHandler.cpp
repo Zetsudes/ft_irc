@@ -269,7 +269,6 @@ void	CommandHandler::partChannel(const std::string& name, const std::string& rea
 		_server.handlePollout(_client);
 		return;
 	}
-	channel->removeClient(&_client);
 
 	std::string partMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PART " + name + " :" + reason + "\r\n";
 	const std::set<Client*>& members = channel->getMembers();
@@ -279,11 +278,10 @@ void	CommandHandler::partChannel(const std::string& name, const std::string& rea
 		_server.handlePollout(**it);
 	}
 
+	channel->removeClient(&_client);
+
 	if (channel->memberCount() == 0)
     _server.removeChannel(name);
-
-	_client.appendToBuffer(partMsg);
-	_server.handlePollout(_client);
 }
 void	CommandHandler::handlePart(const Parsing& parsedCmd) 
 {
@@ -376,10 +374,69 @@ void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 	}
 }
 
-// void	CommandHandler::handleKick(const Parsing& parsedCmd) 
-// {
+void	CommandHandler::handleKick(const Parsing& parsedCmd) 
+{
+	if (parsedCmd.params.size() <= 1)
+	{
+		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	std::string name = parsedCmd.params[0];
+	Channel* channel = _server.getChannel(name);
+	if (!channel)
+	{
+		std::string errorMsg = std::string(ERR_NOSUCHCHANNEL) + " :No such channel ¯\\_(ツ)_/¯\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	if (!(channel->isMember(&_client)))
+	{
+		std::string errorMsg = std::string(ERR_NOTONCHANNEL) + " :You are not on that channel ( ＾◡＾)っ NO\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client); 
+		return;
+	}
+	if (!(channel->isOperator(&_client)))
+	{
+		std::string errorMsg = std::string(ERR_CHANOPRIVSNEEDED) + " :You are not channel operator ( ＾◡＾)っ NO\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client); 
+		return;
+	}
+	Client* target = _server.getClientByNickname(parsedCmd.params[1]);
+	if (!target)
+	{
+		std::string errorMsg = std::string(ERR_NOSUCHNICK) + " " + parsedCmd.params[1] + " :No such nick ¯\\_(ツ)_/¯\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client); 
+		return;
+	}
+	if (!channel->isMember(target))
+	{
+		std::string errorMsg = std::string(ERR_USERNOTINCHANNEL) + " " + target->getNickname() + " " + name + " :They are not on that channel ( ＾◡＾)っ NO\r\n";
+    	_client.appendToBuffer(errorMsg);
+    	_server.handlePollout(_client);
+    return;
+	}
+	std::string reason;
+	if (parsedCmd.params.size() > 2)
+		reason = parsedCmd.params[2];
+	else
+		reason = _client.getNickname();
 
-// }
+	std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost KICK " + name + " " + target->getNickname() + " :" + reason + "\r\n";
+	const std::set<Client*>& members = channel->getMembers();
+	for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+	{
+		(*it)->appendToBuffer(broadcastMsg);
+		_server.handlePollout(**it);
+	}
+
+	channel->removeClient(target);
+}
 
 void	CommandHandler::handleQuit(const Parsing& parsedCmd) 
 {

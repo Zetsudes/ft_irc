@@ -165,6 +165,7 @@ void Server::readClientMessage(int client_fd)
 		else if (cmd == "JOIN")  handler.handleJoin(parse);
 		else if (cmd == "PART")  handler.handlePart(parse);
 		else if (cmd == "TOPIC")  handler.handleTopic(parse);
+		else if (cmd == "KICK")  handler.handleKick(parse);
     }
 }
 
