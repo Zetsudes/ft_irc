@@ -163,6 +163,7 @@ void Server::readClientMessage(int client_fd)
         else if (cmd == "PRIVMSG") handler.handlePrivmsg(parse);
         else if (cmd == "QUIT")  handler.handleQuit(parse);
 		else if (cmd == "JOIN")  handler.handleJoin(parse);
+		else if (cmd == "PART")  handler.handlePart(parse);
     }
 }
 
@@ -203,6 +204,11 @@ const std::string& Server::getPassword() const {
 	return _password;
 }
 
+void Server::removeChannel(const std::string& name)
+{
+	channels.erase(name);
+}
+
 void Server::announceQuit(Client& client, const std::string& reason)
 {
     std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
@@ -240,7 +246,6 @@ void Server::handlePollout(Client& client)
 		if (connections[i].fd == client.getFd())
 		{
 			connections[i].events |= POLLOUT;
-			std::cout << "POLLOUT set for fd " << client.getFd() << std::endl;
 			break;
 		}
 	}

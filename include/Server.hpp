@@ -66,6 +66,7 @@ class Server
 		void sendWelcome(Client& client);
 		void handlePollout(Client& client);
 
+		void removeChannel(const std::string& name);
 		Channel* createChannel(const std::string& name);
 };
 

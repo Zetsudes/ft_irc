@@ -53,7 +53,6 @@ class Channel
 
         size_t memberCount() const;
         size_t operatorCount() const;
-        void clearChannel();
 
         void setInviteOnly(bool status);
         bool isInviteOnly() const;

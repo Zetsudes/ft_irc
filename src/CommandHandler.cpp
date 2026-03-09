@@ -66,7 +66,7 @@ void	CommandHandler::handleNick(const Parsing& parsedCmd)
 	Client* other = _server.getClientByNickname(nickname);
    	if (other && other != &_client) 
 	{
-		std::string errorMsg = std::string(ERR_NICKNAMEINUSE) + " :Nickname is already in use\r\n";
+		std::string errorMsg = std::string(ERR_NICKNAMEINUSE) + std::string(_client.getNickname()) + " :Nickname is already in use\r\n";
 		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 		return;
@@ -252,10 +252,68 @@ void	CommandHandler::handleJoin(const Parsing& parsedCmd)
 
 // }
 
-// void	CommandHandler::handlePart(const Parsing& parsedCmd) 
-// {
+void	CommandHandler::partChannel(const std::string& name, const std::string& reason)
+{
+	Channel* channel = _server.getChannel(name);
+	if (!channel)
+	{
+		std::string errorMsg = std::string(ERR_NOSUCHCHANNEL) + std::string(name) + " :No such channel\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	if (!(channel->isMember(&_client)))
+	{
+		std::string errorMsg = std::string(ERR_NOTONCHANNEL) + std::string(name) + " :You are not on that channel\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	channel->removeClient(&_client);
 
-// }
+	std::string partMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PART " + name + " :" + reason + "\r\n";
+	const std::set<Client*>& members = channel->getMembers();
+	for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+	{
+		(*it)->appendToBuffer(partMsg);
+		_server.handlePollout(**it);
+	}
+
+	if (channel->memberCount() == 0)
+    _server.removeChannel(name);
+
+	_client.appendToBuffer(partMsg);
+	_server.handlePollout(_client);
+}
+void	CommandHandler::handlePart(const Parsing& parsedCmd) 
+{
+	if (parsedCmd.params.size() < 1)
+	{
+		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+
+	std::string reason;
+	if (parsedCmd.params.size() >= 2)
+		reason = parsedCmd.params[1];
+	else
+		reason = _client.getNickname();
+
+	std::string list = parsedCmd.params[0];
+	size_t start = 0;
+	size_t pos;
+
+	while ((pos = list.find(",", start)) != std::string::npos)
+	{
+		std::string name = list.substr(start, pos - start);
+		partChannel(name, reason);
+		start = pos + 1;
+	}
+	std::string name = list.substr(start);
+	partChannel(name, reason);
+}
 
 // void	CommandHandler::handleTopic(const Parsing& parsedCmd) 
 // {

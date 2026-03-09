@@ -68,6 +68,7 @@ class CommandHandler
 		void	handleJoin(const Parsing& parsedCmd); //permet d'aller sur un channel
 		void 	joinChannel(const std::string& name, const std::string& key); //helper
 		void	handlePart(const Parsing& parsedCmd); //permet de partir d'un ou de plusieurs channels
+		void	partChannel(const std::string& name, const std::string& reason); //helper
 		void	handleTopic(const Parsing& parsedCmd); //permet de changer le topic du channel (titre d'un maximum de 80 caractères)
 		void	handleKick(const Parsing& parsedCmd); //permet de virer quelqu'un du channel
 		void	handleInvite(const Parsing& parsedCmd); //permet de gérer les invitations
