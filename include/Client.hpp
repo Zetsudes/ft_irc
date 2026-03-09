@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:11 by zamohame          #+#    #+#             */
-/*   Updated: 2026/03/09 11:44:18 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/09 11:57:18 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Client
 		std::string _buffer;
 		std::string _parseBuffer;
 		bool _registered;
+		bool _passAccepted;
 
 	public:
 		Client(int fd);
@@ -42,6 +43,7 @@ class Client
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
 		void setRealname(const std::string& real);
+		void setPassAccepted(bool accepted);
 
 		void appendToBuffer(const std::string& data);
 		void appendToParseBuffer(const std::string& data);

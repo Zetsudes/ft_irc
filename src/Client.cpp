@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:28:00 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/09 11:44:58 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/09 11:58:18 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 Client::Client(int fd) 
 	: _client_fd(fd),
-	  _registered(false)
+	  _registered(false),
+	  _passAccepted(false)
 {
 }
 Client::~Client() {}
@@ -40,14 +41,18 @@ void Client::setUsername(const std::string& user) {
 	tryRegister();
 }
 
+void Client::setPassAccepted(bool accepted) { _passAccepted = accepted; }
+
 void Client::setRealname(const std::string& real) { _realname = real; }
 
 
 void Client::appendToBuffer(const std::string& data) { _buffer += data; }
 void Client::appendToParseBuffer(const std::string& data) { _parseBuffer += data; }
 void Client::clearBuffer() { _buffer.clear(); }
-bool Client::tryRegister() {
-	if(!_registered && !_nickname.empty())
+
+bool Client::tryRegister() 
+{
+	if(!_registered && !_nickname.empty() && _passAccepted)
 		{
 			_registered = true;
 			return true;

@@ -42,6 +42,8 @@ void	CommandHandler::handlePass(const Parsing& parsedCmd)
 		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 	}
+	else
+   		_client.setPassAccepted(true);
 }
 
 void	CommandHandler::handleNick(const Parsing& parsedCmd) 
