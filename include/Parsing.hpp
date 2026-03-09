@@ -9,8 +9,8 @@ class Parsing {
 		std::string request;
 		std::vector<std::string> params;
 
-		Parsing() {}
-		~Parsing() {}
+		Parsing();
+		~Parsing();
 
 		static Parsing parse(const std::string& line);
 };
