@@ -205,12 +205,15 @@ const std::string& Server::getPassword() const {
 
 void Server::announceQuit(Client& client, const std::string& reason)
 {
-	std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
-	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
-	{
-		if (it->first != client.getFd())
-			send(it->first, msg.c_str(), msg.size(), 0);
-	}
+    std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
+    for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->first != client.getFd())
+        {
+            it->second.appendToBuffer(msg);
+            handlePollout(it->second);
+        }
+    }
 }
 
 void Server::removeClient(int fd)
