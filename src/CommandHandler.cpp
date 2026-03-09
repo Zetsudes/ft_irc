@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 10:53:47 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/05 11:39:36 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/09 09:24:48 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,13 @@ CommandHandler::~CommandHandler() {};
 void	CommandHandler::handlePass(const Parsing& parsedCmd) {
 	if (parsedCmd.params.empty())
 	{
-		std::string errorMsg = std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given\r\n";
+		std::string errorMsg = std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters\r\n";;
 		send(_client.getFd(), errorMsg .c_str(), errorMsg .size(), 0);
 		return;
 	}
 	std::string pwd = parsedCmd.params[0];
 	if (pwd == _server.getPassword()) {
+		_client.setPassAccepted(true);
 		_client.tryRegister();
 	} else {
 		std::string errorMsg = std::string(ERR_PASSWDMISMATCH) + " :Password incorrect\r\n";
@@ -63,7 +64,7 @@ void	CommandHandler::handleUser(const Parsing& parsedCmd) {
 	std::string username = parsedCmd.params[0];
 	std::string hostname = parsedCmd.params[1];
 	std::string servername = parsedCmd.params[2];
-    std::string realname = parsedCmd.params[3];
+	std::string realname = parsedCmd.params[3];
     _client.setUsername(username);
     _client.setRealname(realname);
 	_client.tryRegister();

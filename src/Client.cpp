@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 13:28:00 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/02/26 12:57:42 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/09 09:24:03 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 Client::Client(int fd) 
 	: _client_fd(fd),
-	  _registered(false)
+	  _registered(false),
+	  _passAccepted(false)
 {
 }
 Client::~Client() {}
@@ -41,12 +42,29 @@ void Client::setUsername(const std::string& user) {
 
 void Client::setRealname(const std::string& real) { _realname = real; }
 
+void Client::setPassAccepted(bool accepted) {
+	_passAccepted = accepted;
+}
 
 void Client::appendToBuffer(const std::string& data) { _buffer += data; }
 void Client::clearBuffer() { _buffer.clear(); }
-void Client::tryRegister() {
-	if(!_nickname.empty() && !_username.empty())
+
+void Client::tryRegister()
+{
+	if (_registered)
+		return;
+
+	if(_passAccepted && !_nickname.empty() && !_username.empty())
+	{
 		_registered = true;
+
+		std::string msg = ":ircserv 001 " + _nickname +
+			" :Welcome to the IRC Network " + _nickname + "\r\n";
+
+		send(_client_fd, msg.c_str(), msg.size(), 0);
+	}
 }
 
 bool Client::isRegistered() const { return _registered; }
+
+

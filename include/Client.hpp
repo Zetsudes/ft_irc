@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:44:11 by zamohame          #+#    #+#             */
-/*   Updated: 2026/02/24 15:16:45 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/03/09 09:22:54 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Client
 		std::string _realname;
 		std::string _buffer;
 		bool _registered;
+		bool _passAccepted;
 
 	public:
 		Client(int fd);
@@ -44,5 +45,6 @@ class Client
 		void tryRegister();
 
 		bool isRegistered() const;
+		void setPassAccepted(bool accepted);
 };
 
