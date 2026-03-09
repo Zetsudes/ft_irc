@@ -13,13 +13,9 @@
 # include "../include/Channel.hpp"
 # include "../include/Client.hpp"
 
-Channel::Channel(const std::string& name)
-    : _name(name),
-      _inviteOnly(false),
-      _topicRestricted(false),
-      _userLimit(0)
-{        
-}
+Channel::Channel() : _inviteOnly(false), _topicRestricted(false), _userLimit(0) {}
+
+Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false),  _userLimit(0) {}
 
 Channel::~Channel() {}
 

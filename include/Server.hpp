@@ -62,5 +62,10 @@ class Server
 		void	readClientMessage(int client_fd);
 		void	announceQuit(Client& client, const std::string& reason);
 		void	removeClient(int fd);
+
+		void sendWelcome(Client& client);
+		void handlePollout(Client& client);
+
+		Channel* createChannel(const std::string& name);
 };
 

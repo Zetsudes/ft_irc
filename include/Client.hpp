@@ -15,6 +15,8 @@
 #include <arpa/inet.h>
 #include <iostream>
 
+class Server;
+
 class Client
 {
 	private:
@@ -23,6 +25,7 @@ class Client
 		std::string _username;
 		std::string _realname;
 		std::string _buffer;
+		std::string _parseBuffer;
 		bool _registered;
 
 	public:
@@ -31,6 +34,7 @@ class Client
 
 		int getFd() const;
 		std::string& getBuffer();
+		std::string& getParseBuffer();
 		std::string getNickname() const;
 		std::string getUsername() const;
 		std::string getRealname() const;
@@ -40,8 +44,9 @@ class Client
 		void setRealname(const std::string& real);
 
 		void appendToBuffer(const std::string& data);
+		void appendToParseBuffer(const std::string& data);
 		void clearBuffer();
-		void tryRegister();
+		bool tryRegister();
 
 		bool isRegistered() const;
 };

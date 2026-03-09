@@ -74,6 +74,20 @@ void Server::serverLoop()
 				else
 					readClientMessage(connections[i].fd);
 			}
+
+			if (connections[i].revents & POLLOUT)
+            {
+                Client* client = getClientByFd(connections[i].fd);
+                if (client && !client->getBuffer().empty())
+                {
+                    int bytesSent = send(client->getFd(), client->getBuffer().c_str(), client->getBuffer().size(), 0);
+                    if (bytesSent > 0)
+                        client->getBuffer().erase(0, bytesSent);
+
+                    if (client->getBuffer().empty())
+                        connections[i].events &= ~POLLOUT;
+                }
+            }
 		}
 	}
 }
@@ -123,31 +137,33 @@ void Server::readClientMessage(int client_fd)
 		clients.erase(client_fd);
 		return;
 	}
-	else
-	{
-		std::string line(buffer, bytesRead);
-		while (!line.empty() && (line[line.length() - 1] == '\n' || line[line.length() - 1] == '\r'))
-			line.erase(line.length() - 1);
-		 std::cout << "Received from " << client_fd << ": " << line << std::endl;
-		Parsing parse = Parsing::parse(line);
-		Client* client = getClientByFd(client_fd);
-		if (client)
-		{
-			CommandHandler handler(*this, *client);
-			std::string cmd = parse.request;
-			if (cmd == "PASS")
-				handler.handlePass(parse);
-			else if (cmd == "NICK")
-				handler.handleNick(parse);
-			else if (cmd == "USER")
-				handler.handleUser(parse);
-			else if (cmd == "PRIVMSG")
-				handler.handlePrivmsg(parse);
-			else if (cmd == "QUIT")
-				handler.handleQuit(parse);
-			// JOIN, PART, TOPIC, KICK,...
-		}
-	}
+	 Client* client = getClientByFd(client_fd);
+    if (!client) return;
+
+    client->appendToParseBuffer(std::string(buffer, bytesRead));
+
+    std::string& raw = client->getParseBuffer();
+    std::string::size_type pos;
+    while ((pos = raw.find('\n')) != std::string::npos)
+    {
+        std::string line = raw.substr(0, pos);
+        raw.erase(0, pos + 1);
+
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
+        if (line.empty()) continue;
+
+        std::cout << "Received from " << client_fd << ": " << line << std::endl;
+        Parsing parse = Parsing::parse(line);
+        CommandHandler handler(*this, *client);
+        std::string cmd = parse.request;
+        if (cmd == "PASS")       handler.handlePass(parse);
+        else if (cmd == "NICK")  handler.handleNick(parse);
+        else if (cmd == "USER")  handler.handleUser(parse);
+        else if (cmd == "PRIVMSG") handler.handlePrivmsg(parse);
+        else if (cmd == "QUIT")  handler.handleQuit(parse);
+		else if (cmd == "JOIN")  handler.handleJoin(parse);
+    }
 }
 
 Client* Server::getClientByFd(int fd)
@@ -167,6 +183,20 @@ Client* Server::getClientByNickname(const std::string& nick)
             return &(it->second);
     }
     return NULL;
+}
+
+Channel* Server::getChannel(const std::string& name)
+{
+    std::map<std::string, Channel>::iterator it = channels.find(name);
+    if (it != channels.end())
+        return &(it->second);
+    return NULL;
+}
+
+Channel* Server::createChannel(const std::string &name)
+{
+	channels[name] = Channel(name);
+	return &channels[name];
 }
 
 const std::string& Server::getPassword() const {
@@ -198,5 +228,37 @@ void Server::removeClient(int fd)
 	}
 	close(fd);
 	clients.erase(fd);
+}
+
+void Server::handlePollout(Client& client)
+{
+	for (size_t i = 0; i < connections.size(); i++)
+	{
+		if (connections[i].fd == client.getFd())
+		{
+			connections[i].events |= POLLOUT;
+			std::cout << "POLLOUT set for fd " << client.getFd() << std::endl;
+			break;
+		}
+	}
+}
+
+void Server::sendWelcome(Client& client)
+{
+	std::string nick = client.getNickname();
+	std::string msg;
+
+	msg = ":ircserv 001 " + nick + " :Welcome to the IRC server " + nick + "\r\n";
+	client.appendToBuffer(msg);
+
+	msg = ":ircserv 002 " + nick + " :Your host is ircserv\r\n";
+	client.appendToBuffer(msg);
+
+	msg = ":ircserv 003 " + nick + " :This server was created today\r\n";
+	client.appendToBuffer(msg);
+
+	msg = ":ircserv 004 " + nick + " ircserv 1.0 o o\r\n";
+	client.appendToBuffer(msg);
+	handlePollout(client);
 }
 

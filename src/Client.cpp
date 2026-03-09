@@ -23,6 +23,7 @@ Client::~Client() {}
 // getters
 int Client::getFd () const { return _client_fd; }
 std::string& Client::getBuffer() { return _buffer; }
+std::string& Client::getParseBuffer() { return _parseBuffer; }
 std::string Client::getNickname() const { return _nickname; }
 std::string Client::getUsername() const { return _username; }
 std::string Client::getRealname() const { return _realname; }
@@ -43,10 +44,15 @@ void Client::setRealname(const std::string& real) { _realname = real; }
 
 
 void Client::appendToBuffer(const std::string& data) { _buffer += data; }
+void Client::appendToParseBuffer(const std::string& data) { _parseBuffer += data; }
 void Client::clearBuffer() { _buffer.clear(); }
-void Client::tryRegister() {
-	if(!_nickname.empty() && !_username.empty())
-		_registered = true;
+bool Client::tryRegister() {
+	if(!_registered && !_nickname.empty())
+		{
+			_registered = true;
+			return true;
+		}
+		return false;
 }
 
 bool Client::isRegistered() const { return _registered; }
