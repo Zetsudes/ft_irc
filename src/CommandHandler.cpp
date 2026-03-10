@@ -242,10 +242,175 @@ void	CommandHandler::handleJoin(const Parsing& parsedCmd)
 	joinChannel(name, key);
 }
 
-// void	CommandHandler::handleMode(const Parsing& parsedCmd) 
-// {
+void	CommandHandler::handleMode(const Parsing& parsedCmd) 
+{
+	if (parsedCmd.params.size() < 2)
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	std::string name = parsedCmd.params[0];
+	Channel* channel = _server.getChannel(name);
+	if (!channel)
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	if (!(channel->isMember(&_client)))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTONCHANNEL) + " :You are not on that channel ( ＾◡＾)っ NO\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client); 
+		return;
+	}
+	if (!(channel->isOperator(&_client)))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_CHANOPRIVSNEEDED) + " :You are not channel operator ( ＾◡＾)っ NO\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client); 
+		return;
+	}
 
-// }
+	std::string mode = parsedCmd.params[1];
+	size_t j = 2;
+	bool plus;
+
+	for (size_t i = 0; i < mode.size(); i++)
+	{
+		if (mode[i] == '+')
+			plus = true;
+		else if (mode[i] == '-')
+			plus = false;
+		else if (mode[i] == 'i')
+		{
+			if (plus)
+				channel->setInviteOnly(true);
+			else 
+				channel->setInviteOnly(false);
+		}
+		else if (mode[i] == 't')
+		{
+			if (plus)
+				channel->setTopicRestricted(true);
+			else
+				channel->setTopicRestricted(false);
+		}
+		else if (mode[i] == 'k')
+		{
+			if (plus)
+			{
+				if (j >= parsedCmd.params.size())
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				channel->setKey(parsedCmd.params[j]);
+				j++;
+			}
+			else
+				channel->setKey("");
+		}
+		else if (mode[i] == 'l')
+		{
+			if (plus)
+			{
+				if (j >= parsedCmd.params.size())
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				channel->setUserLimit(std::atoi(parsedCmd.params[j].c_str()));
+				j++;
+			}
+			else
+				channel->setUserLimit(0);
+		}
+		else if (mode[i] == 'o')
+		{
+			if (plus)
+			{
+				if (j >= parsedCmd.params.size())
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				Client* target = _server.getClientByNickname(parsedCmd.params[j]);
+				if (!target)
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHNICK) + " " + parsedCmd.params[0] + " :No such nick ¯\\_(ツ)_/¯\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client); 
+					return;
+				}
+				if (!(channel->isMember(target)))
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_USERNOTINCHANNEL) + " " + target->getNickname() + " " + name + " :They are not on that channel ( ＾◡＾)っ NO\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				if (channel->isOperator(target))
+					return;
+				channel->addOperator(target);
+				j++;
+			}
+			else
+			{
+				if (j >= parsedCmd.params.size())
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				Client* target = _server.getClientByNickname(parsedCmd.params[j]);
+				if (!target)
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHNICK) + " " + parsedCmd.params[0] + " :No such nick ¯\\_(ツ)_/¯\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client); 
+					return;
+				}
+				if (!(channel->isMember(target)))
+				{
+					std::string errorMsg = ":ircserv " + std::string(ERR_USERNOTINCHANNEL) + " " + target->getNickname() + " " + name + " :They are not on that channel ( ＾◡＾)っ NO\r\n";
+					_client.appendToBuffer(errorMsg);
+					_server.handlePollout(_client);
+					return;
+				}
+				channel->removeOperator(target);
+				j++;
+			}
+		}
+		else 
+		{
+			std::string errorMsg = ":ircserv " + std::string(ERR_UNKNOWNMODE) + " " + std::string(1, mode[i]) + " :is unknown mode char to me ∘ ∘ ∘ ( °ヮ° ) ?\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+	}
+	std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost MODE " + name + " " + parsedCmd.params[1];
+	for (size_t k = 2; k < parsedCmd.params.size(); k++)
+		broadcastMsg += " " + parsedCmd.params[k];
+	broadcastMsg += "\r\n";
+	const std::set<Client*>& members = channel->getMembers();
+	for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+	{
+		(*it)->appendToBuffer(broadcastMsg);
+		_server.handlePollout(**it);
+	}
+}
 
 void	CommandHandler::handleInvite(const Parsing& parsedCmd) 
 {
@@ -472,7 +637,7 @@ void	CommandHandler::handleKick(const Parsing& parsedCmd)
 		std::string errorMsg = ":ircserv " + std::string(ERR_USERNOTINCHANNEL) + " " + target->getNickname() + " " + name + " :They are not on that channel ( ＾◡＾)っ NO\r\n";
     	_client.appendToBuffer(errorMsg);
     	_server.handlePollout(_client);
-    return;
+    	return;
 	}
 	std::string reason;
 	if (parsedCmd.params.size() > 2)

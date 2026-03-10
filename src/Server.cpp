@@ -167,6 +167,7 @@ void Server::readClientMessage(int client_fd)
 		else if (cmd == "TOPIC")  handler.handleTopic(parse);
 		else if (cmd == "KICK")  handler.handleKick(parse);
 		else if (cmd == "INVITE")  handler.handleInvite(parse);
+		else if (cmd == "MODE")  handler.handleMode(parse);
     }
 }
 

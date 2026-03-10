@@ -22,14 +22,15 @@
 #define ERR_ALREADYREGISTERED   "462"
 
 // Channel errors
-#define ERR_NOSUCHCHANNEL   "403"    // No such channel
-#define ERR_CHANOPRIVSNEEDED "482"  // You're not channel operator
+#define ERR_NOSUCHCHANNEL   	"403"   // No such channel
+#define ERR_CHANOPRIVSNEEDED 	"482"  // You're not channel operator
 #define ERR_BADCHANNELKEY       "475"  // wrong channel password (+k)
 #define ERR_INVITEONLYCHAN      "473"  // channel is +i and user not invited
 #define ERR_CHANNELISFULL       "471"  // channel is +l and full
 #define ERR_NOTONCHANNEL        "442"  // client not on channel
 #define ERR_USERONCHANNEL       "443"  // INVITE but user already on channel
 #define ERR_USERNOTINCHANNEL    "441"  // KICK target not on channel
+#define ERR_UNKNOWNMODE			"472"  // MODE doesn't exist
 
 // Replies
 #define RPL_WELCOME             "001"
