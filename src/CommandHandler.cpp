@@ -244,6 +244,40 @@ void	CommandHandler::handleJoin(const Parsing& parsedCmd)
 
 void	CommandHandler::handleMode(const Parsing& parsedCmd) 
 {
+	std::string name = parsedCmd.params[0];
+	Channel* channel = _server.getChannel(name);
+	if (parsedCmd.params.size() == 1)
+	{
+		if (!channel)
+		{
+			std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		std::string modes = "+";
+		std::string modeParams;
+		if (channel->isInviteOnly())
+			modes += 'i';
+		if (channel->isTopicRestricted())
+			modes += 't';
+		if (channel->hasKey())
+		{
+			modes += 'k';
+			modeParams += " " + channel->getKey();
+		}
+		if (channel->getUserLimit() != 0)
+		{
+			modes += 'l';
+			std::ostringstream oss;
+			oss << channel->getUserLimit();
+			modeParams += " " + oss.str();
+		}
+		std::string rpl = ":ircserv " + std::string(RPL_CHANNELMODEIS) + " " + _client.getNickname() + " " + name + " " + modes + modeParams + "\r\n";
+		_client.appendToBuffer(rpl);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 2)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -251,8 +285,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
-	std::string name = parsedCmd.params[0];
-	Channel* channel = _server.getChannel(name);
 	if (!channel)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";

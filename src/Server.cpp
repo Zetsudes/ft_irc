@@ -231,6 +231,15 @@ void Server::removeClient(int fd)
 	Client* client = getClientByFd(fd);
 	if (!client)
 		return;
+	std::vector<std::string> toRemove;
+	for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		it->second.removeClient(client);
+		if (it->second.memberCount() == 0)
+			toRemove.push_back(it->first);
+	}
+	for (size_t i = 0; i < toRemove.size(); i++)
+		channels.erase(toRemove[i]);
 	for (size_t i = 0; i < connections.size(); i++)
 	{
 		if (connections[i].fd == fd)

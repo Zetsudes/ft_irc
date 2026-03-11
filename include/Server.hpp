@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 
 class Client;
 class Channel;
