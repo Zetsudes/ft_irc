@@ -15,18 +15,6 @@
 Parsing::Parsing() {}
 Parsing::~Parsing() {}
 
-/* Gestion des erreurs & cas relous = 
-
-Nick déjà pris
-
-Commande inconnue
-
-Mauvais nombre d’arguments
-
-Client pas authentifié
-
-Client qui quitte brutalement*/
-
 Parsing Parsing::parse(const std::string& line) {
 	Parsing parse;
 	size_t start = 0;
