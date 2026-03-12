@@ -6,11 +6,12 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:25:53 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/12 16:33:16 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/12 17:13:20 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+#include <string>
 
 class Bot {
 	private:

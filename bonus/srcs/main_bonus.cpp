@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "mandatory/include/Client.hpp"
-#include "mandatory/include/Channel.hpp"
-#include "mandatory/include/Server.hpp"
+#include "../include/Client_bonus.hpp"
+#include "../include/Channel_bonus.hpp"
+#include "../include/Server_bonus.hpp"
 
 int main(int argc, char **argv)
 {

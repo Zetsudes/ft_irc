@@ -1,30 +1,33 @@
 NAME	= ircserv
+bot 	= bot_bonus
+bonussv = bonussv
 
 CC		= c++
 CFLAGS 	= -Wall -Wextra -Werror -std=c++98
 
-SRCS	=			srcs/Server.cpp\
-					srcs/Client.cpp\
-					srcs/Channel.cpp \
-					srcs/Parsing.cpp \
-					srcs/CommandHandler.cpp \
+SRCS	=			mandatory/srcs/Server.cpp\
+					mandatory/srcs/Client.cpp\
+					mandatory/srcs/Channel.cpp \
+					mandatory/srcs/Parsing.cpp \
+					mandatory/srcs/CommandHandler.cpp \
 					main.cpp\
 
 SRCS_BOT_BONUS =	bonus/srcs/Bot_bonus.cpp\
 					bonus/srcs/main_bot_bonus.cpp\
 
-SRCS_BONUS = 		srcs/Server_bonus.cpp\
-					srcs/Client_bonus.cpp\
-					srcs/Channel_bonus.cpp \
-					srcs/Parsing_bonus.cpp \
-					srcs/CommandHandler_bonus.cpp\
+SRCS_BONUS = 		bonus/srcs/Server_bonus.cpp\
+					bonus/srcs/Client_bonus.cpp\
+					bonus/srcs/Channel_bonus.cpp \
+					bonus/srcs/Parsing_bonus.cpp \
+					bonus/srcs/CommandHandler_bonus.cpp\
+					bonus/srcs/main_bonus.cpp\
 
 OBJS	= $(SRCS:.cpp=.o)
 OBJS_BOT_BONUS = $(SRCS_BOT_BONUS:.cpp=.o)
 OBJS_BONUS = $(SRCS_BONUS:.cpp=.o)
 
 all: $(NAME)
-bonus : $(bot) $(bonussv)
+bonus: $(bot) $(bonussv)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)

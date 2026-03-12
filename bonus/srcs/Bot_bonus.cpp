@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/12 16:38:20 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/12 17:15:45 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cerrno>
 
 Bot::Bot() : nickname("Bot-anic"), username("Bot-terfly"), realname("Bot-oxx") {}
 
@@ -57,6 +58,11 @@ void Bot::connectToServer(const std::string& ip, int port, const std::string& pa
 		throw std::runtime_error("Error: Failed to connect to server");
 	if (fcntl(botFd, F_SETFL, O_NONBLOCK) < 0)
 		throw std::runtime_error("Error: Failed to set socket non-blocking");
+	if (!password.empty()) {
+		std::string passCommand = "PASS " + password + "\r\n";
+		sendMessage(passCommand);  // Envoi de la commande PASS
+	}
+	login();
 }
 
 
@@ -107,7 +113,6 @@ void Bot::receiveMessage()
 }
 
 void Bot::run() {
-	login();
 	joinChannel("chatbot");
     while (true) {
         try {
