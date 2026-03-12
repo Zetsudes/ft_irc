@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/12 17:15:45 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/12 18:06:02 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void Bot::connectToServer(const std::string& ip, int port, const std::string& pa
 		throw std::runtime_error("Error: Failed to set socket non-blocking");
 	if (!password.empty()) {
 		std::string passCommand = "PASS " + password + "\r\n";
-		sendMessage(passCommand);  // Envoi de la commande PASS
+		sendMessage(passCommand);
 	}
 	login();
 }

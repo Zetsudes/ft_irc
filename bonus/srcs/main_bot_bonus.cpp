@@ -5,7 +5,7 @@ int main()
 {
 	Bot NewBot;
 	try {
-		NewBot.connectToServer("127.0.0.1", 6667, "pwd");
+		NewBot.connectToServer("127.0.0.1", 6667, "pwd"); // mettre port qui peux se changer
 		NewBot.run();
 	}
 	catch (const std::exception &e) {
