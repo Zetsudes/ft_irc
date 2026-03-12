@@ -63,22 +63,65 @@ void	CommandHandler::handleNick(const Parsing& parsedCmd)
 		return;
 	}
 	std::string nickname = parsedCmd.params[0];
+	if (nickname.length() > 9)
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_ERRONEUSNICKNAME)
+		+ nickname + " :Erroneous nickname\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	if (!std::isalpha(nickname[0]))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_ERRONEUSNICKNAME)
+		+ nickname + " :Erroneous nickname\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	for (size_t i = 0; i < nickname.length(); i++)
+	{
+		char c = nickname[i];
+		if (!std::isalnum(c) &&
+			c != '[' && c != ']' &&
+			c != '\\' && c != '`' &&
+			c != '_' && c != '^' &&
+			c != '{' && c != '|' &&
+			c != '}')
+		{
+			std::string errorMsg = ":ircserv " + std::string(ERR_ERRONEUSNICKNAME)
+			+ nickname + " :Erroneous nickname\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+	}
 	Client* other = _server.getClientByNickname(nickname);
    	if (other && other != &_client) 
 	{
-		std::string errorMsg = ":ircserv " + std::string(ERR_NICKNAMEINUSE) + std::string(_client.getNickname()) + " :Nickname is already in use ( ≖‿  ≖ )Heehee\r\n";
+		std::string errorMsg = ":ircserv " + std::string(ERR_NICKNAMEINUSE) + " " + nickname + " :Nickname is already in use\r\n";
 		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 		return;
     }
 	_client.setNickname(nickname);
-	if (_client.isRegistered())
+	if (_client.tryRegister())
+	{
 		_server.sendWelcome(_client);
+	}
 }
 
 void	CommandHandler::handleUser(const Parsing& parsedCmd) 
 {
 	(void)_server;
+	if (_client.isRegistered())
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_ALREADYREGISTERED)
+		+ " :You may not reregister\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 4) {
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
 		_client.appendToBuffer(errorMsg);
@@ -91,6 +134,8 @@ void	CommandHandler::handleUser(const Parsing& parsedCmd)
     std::string realname = parsedCmd.params[3];
     _client.setUsername(username);
     _client.setRealname(realname);
+	if (_client.isRegistered())
+		_server.sendWelcome(_client);
 }
 
 void CommandHandler::handlePrivmsg(const Parsing& parsedCmd) 
@@ -399,7 +444,8 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 			_server.handlePollout(_client);
 			return;
 		}
-	}
+	}	if (_client.isRegistered())
+	_server.sendWelcome(_client);
 	std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost MODE " + name + " " + parsedCmd.params[1];
 	for (size_t k = 2; k < parsedCmd.params.size(); k++)
 		broadcastMsg += " " + parsedCmd.params[k];

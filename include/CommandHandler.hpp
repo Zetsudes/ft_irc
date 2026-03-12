@@ -12,9 +12,11 @@
 
 #pragma once
 #include <string>
+#include <cctype>
 
 //Authentification errors
 #define ERR_NONICKNAMEGIVEN		"431"
+#define ERR_ERRONEUSNICKNAME	"432"
 #define ERR_NICKNAMEINUSE		"433"
 #define ERR_NEEDMOREPARAMS		"461"
 #define ERR_PASSWDMISMATCH		"464"
@@ -62,7 +64,7 @@ class CommandHandler
 		void	handleNick(const Parsing& parsedCmd); //permet de changer de nickname
 		void	handleUser(const Parsing& parsedCmd);
 
-		//Messages
+		//Messagesircv3 specification
 		void	handlePrivmsg(const Parsing& parsedCmd); //permet d'envoyer un message en privé à un utilisateur
 
 		//Channels
