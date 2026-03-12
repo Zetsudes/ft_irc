@@ -52,12 +52,12 @@ void Client::clearBuffer() { _buffer.clear(); }
 
 bool Client::tryRegister() 
 {
-	if(!_registered && !_nickname.empty() && _passAccepted)
-		{
-			_registered = true;
-			return true;
-		}
-		return false;
+    if (!_registered && !_nickname.empty() && !_username.empty() && _passAccepted)
+    {
+		_registered = true;
+		return true;
+    }
+	return false;
 }
 
 bool Client::isRegistered() const { return _registered; }
