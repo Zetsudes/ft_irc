@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/16 10:20:58 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/16 10:40:52 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,10 @@ std::string Bot::respond(const std::string &receivedMessage, const std::string &
 		return "PRIVMSG " + from + " :*virtual hug* 🤗";
 	if(containsCommand(receivedMessage, "!joke"))
 		return "PRIVMSG " + from + " :Why are programmers so skinny? Because they refuse cookies. 🍪";
+	if(containsCommand(receivedMessage, "!guessmyfart"))
+		return "PRIVMSG " + from + " :PROUUUUT";
+	if(containsCommand(receivedMessage, "!horoscope"))
+		return "PRIVMSG " + from + " :You will be testing the new Chocapic roasted chicken flavor. Beware.";
 	return "";
 }
 void Bot::setFd(int fd) { this->botFd = fd; }
