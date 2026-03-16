@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/12 18:06:02 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/16 09:46:34 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include <fcntl.h>
 #include <cerrno>
 
-Bot::Bot() : nickname("Bot-anic"), username("Bot-terfly"), realname("Bot-oxx") {}
+Bot::Bot() : nickname("Botanic"), username("Botterfly"), realname("Botoxx") {}
 
 Bot::~Bot() {}
 
@@ -33,9 +33,9 @@ static bool containsCommand(const std::string &commandText, const std::string &c
 
 std::string Bot::respond(const std::string &receivedMessage, const std::string &from)
 {
-	if(containsCommand(receivedMessage, "hug"))
+	if(containsCommand(receivedMessage, "!hug"))
 		return "PRIVMSG " + from + " :*virtual hug* 🤗";
-	if(containsCommand(receivedMessage, "joke"))
+	if(containsCommand(receivedMessage, "!joke"))
 		return "PRIVMSG " + from + " :Why are programmers so skinny? Because they refuse cookies. 🍪";
 	return "";
 }
@@ -70,55 +70,68 @@ void Bot::sendMessage(const std::string& msg)
 {
 	if (this->botFd < 0)
 	throw std::runtime_error("Socket not connected");
-    ssize_t n = write(botFd, msg.c_str(), msg.size());
-    if (n < 0)
+	ssize_t n = write(botFd, msg.c_str(), msg.size());
+	if (n < 0)
 	throw std::runtime_error("Failed to send message");
 }
 
 void Bot::login() {
-    sendMessage("NICK " + nickname + "\r\n");
-    sendMessage("USER " + username + " 0 * :" + realname + "\r\n");
+	sendMessage("NICK " + nickname + "\r\n");
+	sendMessage("USER " + username + " 0 * :" + realname + "\r\n");
 }
 
 void Bot::joinChannel(const std::string& channel) {
-	std::string joinCmd = "JOIN #" + channel + "\r\n";
+	std::string joinCmd = "JOIN " + channel + "\r\n";
 	sendMessage(joinCmd);
 }
 
-void Bot::receiveMessage() 
-{
-    char buffer[512];
-    ssize_t n = read(botFd, buffer, sizeof(buffer) - 1);
-    if (n > 0) {
-        buffer[n] = '\0';
-		std::string receivedMessage(buffer);
-        if (receivedMessage.find("PING") == 0) {
-            std::string server = receivedMessage.substr(5);
-            sendMessage("PONG " + server + "\r\n");
-            return;
-        }
-        std::string from = "unknown";
-        if (!receivedMessage.empty() && receivedMessage[0] == ':') {
-            size_t spacePos = receivedMessage.find(' ');
-            if (spacePos != std::string::npos)
-                from = receivedMessage.substr(1, spacePos - 1);
-        }
-        std::string response = respond(receivedMessage, from);
-        if (!response.empty()) {
-            sendMessage(response + "\r\n");
-        }
-    } else if (n < 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
-        throw std::runtime_error("Error: Failed to read from socket");
-    }
-}
-
 void Bot::run() {
-	joinChannel("chatbot");
-    while (true) {
+	bool registered = false;
+	while (true) {
         try {
-            receiveMessage();
+            char buffer[512];
+            ssize_t n = read(botFd, buffer, sizeof(buffer) - 1);
+            if (n > 0) {
+                buffer[n] = '\0';
+                std::string msg(buffer);
+
+                if (msg.find("PING") == 0) {
+                    sendMessage("PONG " + msg.substr(5) + "\r\n");
+                    continue;
+                }
+                if (!registered && msg.find(" 001 ") != std::string::npos) {
+                    registered = true;
+                    joinChannel("#chatbot");
+                    continue;
+                }
+                std::string from = "unknown";
+                if (!msg.empty() && msg[0] == ':') {
+                    size_t spacePos = msg.find(' ');
+                    if (spacePos != std::string::npos) {
+                        from = msg.substr(1, spacePos - 1);
+                        size_t exclamPos = from.find('!');
+                        if (exclamPos != std::string::npos)
+                            from = from.substr(0, exclamPos);
+                    }
+                }
+                std::string target = "unknown";
+                size_t privmsgPos = msg.find("PRIVMSG ");
+                if (privmsgPos != std::string::npos) {
+                    size_t targetStart = privmsgPos + 8;
+                    size_t targetEnd = msg.find(' ', targetStart);
+                    if (targetEnd != std::string::npos)
+                        target = msg.substr(targetStart, targetEnd - targetStart);
+                }
+				std::string replyTo = from;
+				std::string response = respond(msg, replyTo);
+                if (!response.empty())
+                    sendMessage(response + "\r\n");
+
+            } else if (n < 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
+                throw std::runtime_error("Error: Failed to read from socket");
+            }
         } catch (const std::exception &e) {
             std::cerr << "Error: " << e.what() << std::endl;
-        }
-    }
+		}
+	}
 }
