@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:25:53 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/12 17:13:20 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/16 09:32:24 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ class Bot {
 		std::string nickname;
 		std::string username;
 		std::string realname;
-		
+
 	public:
 		Bot();
 		~Bot();
@@ -29,7 +29,6 @@ class Bot {
 		void connectToServer(const std::string &ip, int port, const std::string &password);
 		void login();
 		void joinChannel(const std::string& channel);
-		void receiveMessage();
 		void run();
 		void sendMessage(const std::string& msg);
 };
