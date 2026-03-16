@@ -6,7 +6,7 @@
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/16 09:46:34 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/16 10:20:58 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,50 +88,36 @@ void Bot::joinChannel(const std::string& channel) {
 void Bot::run() {
 	bool registered = false;
 	while (true) {
-        try {
-            char buffer[512];
-            ssize_t n = read(botFd, buffer, sizeof(buffer) - 1);
-            if (n > 0) {
-                buffer[n] = '\0';
-                std::string msg(buffer);
-
-                if (msg.find("PING") == 0) {
-                    sendMessage("PONG " + msg.substr(5) + "\r\n");
-                    continue;
-                }
-                if (!registered && msg.find(" 001 ") != std::string::npos) {
-                    registered = true;
-                    joinChannel("#chatbot");
-                    continue;
-                }
-                std::string from = "unknown";
-                if (!msg.empty() && msg[0] == ':') {
-                    size_t spacePos = msg.find(' ');
-                    if (spacePos != std::string::npos) {
-                        from = msg.substr(1, spacePos - 1);
-                        size_t exclamPos = from.find('!');
-                        if (exclamPos != std::string::npos)
-                            from = from.substr(0, exclamPos);
-                    }
-                }
-                std::string target = "unknown";
-                size_t privmsgPos = msg.find("PRIVMSG ");
-                if (privmsgPos != std::string::npos) {
-                    size_t targetStart = privmsgPos + 8;
-                    size_t targetEnd = msg.find(' ', targetStart);
-                    if (targetEnd != std::string::npos)
-                        target = msg.substr(targetStart, targetEnd - targetStart);
-                }
+		try {
+			char buffer[512];
+			ssize_t n = read(botFd, buffer, sizeof(buffer) - 1);
+			if (n > 0) {
+				buffer[n] = '\0';
+				std::string msg(buffer);
+				if (!registered && msg.find(" 001 ") != std::string::npos) {
+					registered = true;
+					joinChannel("#chatbot");
+					continue;
+				}
+				std::string from = "";
+				if (!msg.empty() && msg[0] == ':') {
+					size_t spacePos = msg.find(' ');
+					if (spacePos != std::string::npos) {
+						from = msg.substr(1, spacePos - 1);
+						size_t exclamPos = from.find('!');
+						if (exclamPos != std::string::npos)
+							from = from.substr(0, exclamPos);
+					}
+				}
 				std::string replyTo = from;
 				std::string response = respond(msg, replyTo);
-                if (!response.empty())
-                    sendMessage(response + "\r\n");
-
-            } else if (n < 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
-                throw std::runtime_error("Error: Failed to read from socket");
-            }
-        } catch (const std::exception &e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+				if (!response.empty())
+					sendMessage(response + "\r\n");
+			} else if (n < 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
+				throw std::runtime_error("Error: Failed to read from socket");
+			}
+		} catch (const std::exception &e) {
+			std::cerr << "Error: " << e.what() << std::endl;
 		}
 	}
 }
