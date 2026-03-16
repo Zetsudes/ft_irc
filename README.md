@@ -11,7 +11,7 @@ The server manages all communication between clients according to the IRC protoc
 To use the server, first compile it by running `make`. Then launch it with `./ircserv <PORT> <PASSWORD>`, replacing `<PORT>` with the port number the server should listen on and `<PASSWORD>` with the password clients must provide to connect. Clients can connect and interact with the server using IRC commands such as `PASS`, `NICK`, `USER`, `JOIN`, and `PRIVMSG` to log in, join channels, and send messages to other users.
 
 ### Resources
-***TimGPT (or tcezard)*** 
+***TimGPT (or tcezard)***
 Better than any AI, he was able to enlighten us about poll(), POLLIN/POLLOUT, communication between server and clients and the kernel amongst many other things. The exchange lasted an hour and not one nanosecond was wasted. His efforts shall not be in vain.
 
 
@@ -20,7 +20,15 @@ Each IRC client connects to the IRC server, sends commands, and receives respons
 All messages go through the server.
 
 ### Testing with IRC Clients
-nc localhost port 
+nc localhost port
 irssi
 Hexchat
 
+### Bonus
+
+#### How it works
+First launch the server: ./bonussv <PORT> <PASSWORD>
+Then launch the bot: ./bot_bonus <IP> <PORT> <PASSWORD>
+The bot will automatically join the channel #chatbot once registered.
+Any client in the channel can use the following commands: !hug, !joke, !guessmyfart, !horoscope.
+The bot responds in private message to the user who sent the command.
