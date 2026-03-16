@@ -140,43 +140,43 @@ void	CommandHandler::handleUser(const Parsing& parsedCmd)
 
 void CommandHandler::handlePrivmsg(const Parsing& parsedCmd)
 {
-    if (parsedCmd.params.size() < 2) {
-        std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
-        _client.appendToBuffer(errorMsg);
-        _server.handlePollout(_client);
-        return;
-    }
-    std::string userDest = parsedCmd.params[0];
-    std::string msg = parsedCmd.params[1];
+	if (parsedCmd.params.size() < 2) {
+		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
+	std::string userDest = parsedCmd.params[0];
+	std::string msg = parsedCmd.params[1];
 
-    if (!userDest.empty() && userDest[0] == '#') {
-        Channel* channel = _server.getChannel(userDest);
-        if (!channel) {
-            std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + userDest + " :No such channel ¯\\_(ツ)_/¯\r\n";
-            _client.appendToBuffer(errorMsg);
-            _server.handlePollout(_client);
-            return;
-        }
-        std::string msgToSend = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PRIVMSG " + userDest + " :" + msg + "\r\n";
-        const std::set<Client*>& members = channel->getMembers();
-        for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it) {
-            if ((*it)->getFd() != _client.getFd()) {
-                (*it)->appendToBuffer(msgToSend);
-                _server.handlePollout(**it);
-            }
-        }
-    } else {
-        Client* target = _server.getClientByNickname(userDest);
-        if (!target) {
-            std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHNICK) + " " + userDest + " :No such nick/channel ¯\\_(ツ)_/¯\r\n";
-            _client.appendToBuffer(errorMsg);
-            _server.handlePollout(_client);
-            return;
-        }
-        std::string msgToSend = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PRIVMSG " + userDest + " :" + msg + "\r\n";
-        target->appendToBuffer(msgToSend);
-        _server.handlePollout(*target);
-    }
+	if (!userDest.empty() && userDest[0] == '#') {
+		Channel* channel = _server.getChannel(userDest);
+		if (!channel) {
+			std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + userDest + " :No such channel ¯\\_(ツ)_/¯\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		std::string msgToSend = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PRIVMSG " + userDest + " :" + msg + "\r\n";
+		const std::set<Client*>& members = channel->getMembers();
+		for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it) {
+			if ((*it)->getFd() != _client.getFd()) {
+				(*it)->appendToBuffer(msgToSend);
+				_server.handlePollout(**it);
+			}
+		}
+	} else {
+		Client* target = _server.getClientByNickname(userDest);
+		if (!target) {
+			std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHNICK) + " " + userDest + " :No such nick/channel ¯\\_(ツ)_/¯\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		std::string msgToSend = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost PRIVMSG " + userDest + " :" + msg + "\r\n";
+		target->appendToBuffer(msgToSend);
+		_server.handlePollout(*target);
+	}
 }
 
 void CommandHandler::joinChannel(const std::string& name, const std::string& key)

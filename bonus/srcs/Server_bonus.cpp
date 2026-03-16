@@ -257,6 +257,7 @@ void Server::handlePollout(Client& client)
 
 void Server::sendWelcome(Client& client)
 {
+	std::cout << "Sending welcome to " << client.getNickname() << std::endl;
 	std::string nick = client.getNickname();
 	std::string msg;
 
