@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot_bonus.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/16 10:40:52 by pmeimoun         ###   ########.fr       */
+/*   Updated: 2026/03/24 17:02:28 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ void Bot::run() {
 			if (n > 0) {
 				buffer[n] = '\0';
 				std::string msg(buffer);
+				std::cout << msg << std::endl;
 				if (!registered && msg.find(" 001 ") != std::string::npos) {
 					registered = true;
 					joinChannel("#chatbot");

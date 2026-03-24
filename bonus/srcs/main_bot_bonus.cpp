@@ -4,8 +4,13 @@
 
 int main(int argc, char **argv)
 {
+	if (argc != 2)
+    {
+        std::cerr << "Usage: ./bot_bonus <port>" << std::endl;
+        return 1;
+    }
+
 	Bot NewBot;
-	(void)argc;
 	try {
 		int port = std::atoi(argv[1]);
 		NewBot.connectToServer("127.0.0.1", port, "pwd"); 
