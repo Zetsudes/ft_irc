@@ -1,11 +1,14 @@
 #include "../include/Bot_bonus.hpp"
 #include <iostream>
+#include <cstdlib>
 
-int main()
+int main(int argc, char **argv)
 {
 	Bot NewBot;
+	(void)argc;
 	try {
-		NewBot.connectToServer("127.0.0.1", 6667, "pwd"); // mettre port qui peux se changer
+		int port = std::atoi(argv[1]);
+		NewBot.connectToServer("127.0.0.1", port, "pwd"); 
 		NewBot.run();
 	}
 	catch (const std::exception &e) {
