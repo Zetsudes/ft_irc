@@ -67,7 +67,7 @@ void Server::serverLoop()
 			throw std::runtime_error("Error: poll() failed");
 		for (size_t i = 0; i < connections.size(); i++)
 		{
-			if (connections[i].revents & POLLIN)
+			 if (connections[i].revents & POLLIN)
 			{
 				if (connections[i].fd == server_fd)
 					acceptNewClient();
@@ -215,13 +215,24 @@ void Server::removeChannel(const std::string& name)
 
 void Server::announceQuit(Client& client, const std::string& reason)
 {
-    std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
-    for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+    std::string msg = ":" + client.getNickname() + "!" + client.getUsername() + "@localhost QUIT :" + reason + "\r\n";
+
+    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
     {
-        if (it->first != client.getFd())
+        Channel& channel = it->second;
+
+        if (channel.isMember(&client))
         {
-            it->second.appendToBuffer(msg);
-            handlePollout(it->second);
+            const std::set<Client*>& members = channel.getMembers();
+
+            for (std::set<Client*>::const_iterator m = members.begin(); m != members.end(); ++m)
+            {
+                if (*m != &client)
+                {
+                    (*m)->appendToBuffer(msg);
+                    handlePollout(**m);
+                }
+            }
         }
     }
 }
@@ -231,6 +242,17 @@ void Server::removeClient(int fd)
 	Client* client = getClientByFd(fd);
 	if (!client)
 		return;
+
+	announceQuit(*client, "Client disconnected");
+	std::vector<std::string> toRemove;
+	for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		it->second.removeClient(client);
+		if (it->second.memberCount() == 0)
+			toRemove.push_back(it->first);
+	}
+	for (size_t i = 0; i < toRemove.size(); i++)
+		channels.erase(toRemove[i]);
 	for (size_t i = 0; i < connections.size(); i++)
 	{
 		if (connections[i].fd == fd)
