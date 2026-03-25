@@ -38,6 +38,11 @@ void Channel::removeClient(Client* client) {
     _members.erase(client);
     _operators.erase(client);
     _invitedClients.erase(client);
+    if (_operators.empty() && !_members.empty())
+    {
+        Client* newOp = *(_members.begin()); 
+        _operators.insert(newOp);
+    }
 }
 
 bool Channel::isMember(Client* client) const {
