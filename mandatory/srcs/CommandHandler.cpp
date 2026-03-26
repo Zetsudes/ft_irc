@@ -723,11 +723,11 @@ void	CommandHandler::handleKick(const Parsing& parsedCmd)
 void	CommandHandler::handleQuit(const Parsing& parsedCmd)
 {
 	std::string reason;
-	if (parsedCmd.params.empty()) {
+	if (parsedCmd.params.empty())
 		reason = "Client quit";
-	} else {
+	else
 		reason = parsedCmd.params[0];
-	}
+	std::cout << "Client " << _client.getNickname() << " (fd " << _client.getFd() << ") disconnected: " << reason << std::endl;
 	_server.announceQuit(_client, reason);
 	_server.removeClient(_client.getFd());
 }
