@@ -233,6 +233,7 @@ void Server::removeClient(int fd)
 		return;
 
 	announceQuit(*client, "Client disconnected");
+
 	std::vector<std::string> toRemove;
 	for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
