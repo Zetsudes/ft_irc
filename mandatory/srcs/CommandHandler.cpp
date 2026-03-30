@@ -140,6 +140,13 @@ void	CommandHandler::handleUser(const Parsing& parsedCmd)
 
 void CommandHandler::handlePrivmsg(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 2) {
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
 		_client.appendToBuffer(errorMsg);
@@ -260,6 +267,13 @@ void CommandHandler::joinChannel(const std::string& name, const std::string& key
 
 void	CommandHandler::handleJoin(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -338,6 +352,10 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		}
 		std::string rpl = ":ircserv " + std::string(RPL_CHANNELMODEIS) + " " + _client.getNickname() + " " + name + " " + modes + modeParams + "\r\n";
 		_client.appendToBuffer(rpl);
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 		return;
 	}
@@ -494,8 +512,7 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 			_server.handlePollout(_client);
 			return;
 		}
-	}	if (_client.isRegistered())
-	_server.sendWelcome(_client);
+	}	
 	std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost MODE " + name + " " + parsedCmd.params[1];
 	for (size_t k = 2; k < parsedCmd.params.size(); k++)
 		broadcastMsg += " " + parsedCmd.params[k];
@@ -507,9 +524,17 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		_server.handlePollout(**it);
 	}
 }
+}
 
 void	CommandHandler::handleInvite(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() <= 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -599,6 +624,13 @@ void	CommandHandler::partChannel(const std::string& name, const std::string& rea
 }
 void	CommandHandler::handlePart(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -629,6 +661,13 @@ void	CommandHandler::handlePart(const Parsing& parsedCmd)
 
 void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() < 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -690,6 +729,13 @@ void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 
 void	CommandHandler::handleKick(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	if (parsedCmd.params.size() <= 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -754,6 +800,13 @@ void	CommandHandler::handleKick(const Parsing& parsedCmd)
 
 void	CommandHandler::handleQuit(const Parsing& parsedCmd)
 {
+	if (!(_client.isRegistered()))
+	{
+		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+		_client.appendToBuffer(errorMsg);
+		_server.handlePollout(_client);
+		return;
+	}
 	std::string reason;
 	if (parsedCmd.params.empty())
 		reason = "Client quit";

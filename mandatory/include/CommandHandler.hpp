@@ -22,6 +22,7 @@
 #define ERR_PASSWDMISMATCH		"464"
 #define ERR_NOSUCHNICK			"401"
 #define ERR_ALREADYREGISTERED   "462"
+#define ERR_NOTREGISTERED       "451"
 
 // Channel errors
 #define ERR_NOSUCHCHANNEL   	"403"   // No such channel
