@@ -59,14 +59,13 @@ class Server
 		void	createSocket();
 		void	serverLoop();
 		void	acceptNewClient();
-		void	readClientMessage(int client_fd);
 		void	announceQuit(Client& client, const std::string& reason);
 		void	removeClient(int fd);
 
-		void sendWelcome(Client& client);
-		void handlePollout(Client& client);
+		void	sendWelcome(Client& client);
+		void	handlePollout(Client& client);
 
-		void removeChannel(const std::string& name);
+		void	removeChannel(const std::string& name);
 		Channel* createChannel(const std::string& name);
 };
 

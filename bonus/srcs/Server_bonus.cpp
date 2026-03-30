@@ -11,11 +11,20 @@
 /* ************************************************************************** */
 
 #include "../include/Server_bonus.hpp"
+#include <csignal>
 
+static int g_signal_exit = 0;
+
+static void handleSignal(int signal)
+{
+	(void)signal;
+	g_signal_exit = 1;
+}
 
 Server::Server(int port, const std::string& password)
     : _port(port), _password(password)
 {
+	signal(SIGINT, handleSignal);
     createSocket();
 }
 
@@ -61,26 +70,108 @@ void Server::createSocket()
 
 void Server::serverLoop()
 {
-	while (true)
-	{
-		if (poll(&connections[0], connections.size(), -1) == -1)
-			throw std::runtime_error("Error: poll() failed");
-		for (size_t i = 0; i < connections.size(); i++)
-		{
-			 if (connections[i].revents & POLLIN)
-			{
-				if (connections[i].fd == server_fd)
-					acceptNewClient();
-				else
-					readClientMessage(connections[i].fd);
-			}
-
-			if (connections[i].revents & POLLOUT)
+    while (true)
+    {
+        if (poll(&connections[0], connections.size(), -1) == -1)
+        {
+            if (g_signal_exit)
             {
-                Client* client = getClientByFd(connections[i].fd);
+                std::vector<int> clientFds;
+                for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+                    clientFds.push_back(it->first);
+
+                for (size_t i = 0; i < clientFds.size(); i++)
+                    removeClient(clientFds[i]);
+                break;
+            }
+            throw std::runtime_error("Error: poll() failed");
+        }
+        for (size_t i = 0; i < connections.size();)
+        {
+            int fd = connections[i].fd;
+            if (connections[i].revents & POLLIN)
+            {
+                if (fd == server_fd)
+                {
+                    acceptNewClient();
+                    i++;
+                    continue;
+                }
+                char buffer[1024] = {};
+                int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
+                if (bytesRead <= 0)
+                {
+                    Client* client = getClientByFd(fd);
+                    if (client)
+                    {
+                        std::cout << "Client disconnected: " << fd << std::endl;
+                        std::vector<std::string> toRemove;
+                        for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+                        {
+                            it->second.removeClient(client);
+                            if (it->second.memberCount() == 0)
+                                toRemove.push_back(it->first);
+                        }
+                        for (size_t j = 0; j < toRemove.size(); j++)
+                            channels.erase(toRemove[j]);
+                    }
+                    for (size_t j = 0; j < connections.size(); j++)
+                    {
+                        if (connections[j].fd == fd)
+                        {
+                            connections.erase(connections.begin() + j);
+                            break;
+                        }
+                    }
+                    close(fd);
+                    clients.erase(fd);
+                    continue;
+                }
+                Client* client = getClientByFd(fd);
+                if (client)
+                {
+                    client->appendToParseBuffer(std::string(buffer, bytesRead));
+
+                    std::string& raw = client->getParseBuffer();
+                    std::string::size_type pos;
+                    while ((pos = raw.find('\n')) != std::string::npos)
+                    {
+                        std::string line = raw.substr(0, pos);
+                        raw.erase(0, pos + 1);
+
+						if (!line.empty() && line[line.size() - 1] == '\r')
+							line.erase(line.size() - 1, 1);
+                        if (line.empty())
+                            continue;
+
+                        std::cout << "Received from " << fd << ": " << line << std::endl;
+
+                        Parsing parse = Parsing::parse(line);
+                        CommandHandler handler(*this, *client);
+                        std::string cmd = parse.request;
+
+                        if (cmd == "PASS")       handler.handlePass(parse);
+                        else if (cmd == "NICK")  handler.handleNick(parse);
+                        else if (cmd == "USER")  handler.handleUser(parse);
+                        else if (cmd == "PRIVMSG") handler.handlePrivmsg(parse);
+                        else if (cmd == "QUIT")  { handler.handleQuit(parse); break; }
+                        else if (cmd == "JOIN")  handler.handleJoin(parse);
+                        else if (cmd == "PART")  handler.handlePart(parse);
+                        else if (cmd == "TOPIC") handler.handleTopic(parse);
+                        else if (cmd == "KICK")  handler.handleKick(parse);
+                        else if (cmd == "INVITE") handler.handleInvite(parse);
+                        else if (cmd == "MODE")  handler.handleMode(parse);
+                    }
+                }
+                i++;
+                continue;
+            }
+            if (connections[i].revents & POLLOUT)
+            {
+                Client* client = getClientByFd(fd);
                 if (client && !client->getBuffer().empty())
                 {
-                    int bytesSent = send(client->getFd(), client->getBuffer().c_str(), client->getBuffer().size(), 0);
+                    int bytesSent = send(fd, client->getBuffer().c_str(), client->getBuffer().size(), 0);
                     if (bytesSent > 0)
                         client->getBuffer().erase(0, bytesSent);
 
@@ -88,8 +179,9 @@ void Server::serverLoop()
                         connections[i].events &= ~POLLOUT;
                 }
             }
-		}
-	}
+            i++; 
+        }
+    }
 }
 
 void Server::acceptNewClient()
@@ -116,59 +208,6 @@ void Server::acceptNewClient()
 		clients.insert(std::make_pair(client_fd, Client(client_fd)));
 		std::cout << "New client connected: " << client_fd << std::endl;
 	}
-}
-
-void Server::readClientMessage(int client_fd)
-{
-	char buffer[1024] = {};
-	int bytesRead = recv(client_fd, buffer, sizeof(buffer), 0);
-	if (bytesRead <= 0)
-	{
-		std::cout << "Client disconnected: " << client_fd << std::endl;
-		close(client_fd);
-		for (size_t i = 0; i < connections.size(); i++)
-		{
-			if (connections[i].fd == client_fd)
-			{
-				connections.erase(connections.begin() + i);
-				break;
-			}
-		}
-		clients.erase(client_fd);
-		return;
-	}
-	 Client* client = getClientByFd(client_fd);
-    if (!client) return;
-
-    client->appendToParseBuffer(std::string(buffer, bytesRead));
-
-    std::string& raw = client->getParseBuffer();
-    std::string::size_type pos;
-    while ((pos = raw.find('\n')) != std::string::npos)
-    {
-        std::string line = raw.substr(0, pos);
-        raw.erase(0, pos + 1);
-
-        if (!line.empty() && line[line.size() - 1] == '\r')
-            line.erase(line.size() - 1);
-        if (line.empty()) continue;
-
-        std::cout << "Received from " << client_fd << ": " << line << std::endl;
-        Parsing parse = Parsing::parse(line);
-        CommandHandler handler(*this, *client);
-        std::string cmd = parse.request;
-        if (cmd == "PASS")       handler.handlePass(parse);
-        else if (cmd == "NICK")  handler.handleNick(parse);
-        else if (cmd == "USER")  handler.handleUser(parse);
-        else if (cmd == "PRIVMSG") handler.handlePrivmsg(parse);
-        else if (cmd == "QUIT")  handler.handleQuit(parse);
-		else if (cmd == "JOIN")  handler.handleJoin(parse);
-		else if (cmd == "PART")  handler.handlePart(parse);
-		else if (cmd == "TOPIC")  handler.handleTopic(parse);
-		else if (cmd == "KICK")  handler.handleKick(parse);
-		else if (cmd == "INVITE")  handler.handleInvite(parse);
-		else if (cmd == "MODE")  handler.handleMode(parse);
-    }
 }
 
 Client* Server::getClientByFd(int fd)
@@ -215,24 +254,13 @@ void Server::removeChannel(const std::string& name)
 
 void Server::announceQuit(Client& client, const std::string& reason)
 {
-    std::string msg = ":" + client.getNickname() + "!" + client.getUsername() + "@localhost QUIT :" + reason + "\r\n";
-
-    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+    std::string msg = ":" + client.getNickname() + " QUIT :" + reason + "\r\n";
+    for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
     {
-        Channel& channel = it->second;
-
-        if (channel.isMember(&client))
+        if (it->first != client.getFd())
         {
-            const std::set<Client*>& members = channel.getMembers();
-
-            for (std::set<Client*>::const_iterator m = members.begin(); m != members.end(); ++m)
-            {
-                if (*m != &client)
-                {
-                    (*m)->appendToBuffer(msg);
-                    handlePollout(**m);
-                }
-            }
+            it->second.appendToBuffer(msg);
+            handlePollout(it->second);
         }
     }
 }
@@ -296,4 +324,3 @@ void Server::sendWelcome(Client& client)
 	client.appendToBuffer(msg);
 	handlePollout(client);
 }
-
