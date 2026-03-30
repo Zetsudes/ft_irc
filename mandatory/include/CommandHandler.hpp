@@ -22,7 +22,6 @@
 #define ERR_PASSWDMISMATCH		"464"
 #define ERR_NOSUCHNICK			"401"
 #define ERR_ALREADYREGISTERED   "462"
-#define ERR_NOTREGISTERED       "451"
 
 // Channel errors
 #define ERR_NOSUCHCHANNEL   	"403"   // No such channel
@@ -45,7 +44,6 @@
 #define RPL_TOPIC               "332"  // channel topic
 #define RPL_NAMREPLY            "353"  // list of users in channel after JOIN
 #define RPL_ENDOFNAMES          "366"  // end of NAMES list
-#define RPL_CHANNELMODEIS		"324"  // displays the current modes
 
 class Server;
 class Client;

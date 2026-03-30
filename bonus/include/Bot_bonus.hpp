@@ -3,17 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot_bonus.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-<<<<<<< HEAD
 /*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:25:53 by pmeimoun          #+#    #+#             */
 /*   Updated: 2026/03/16 09:32:24 by pmeimoun         ###   ########.fr       */
-=======
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/12 11:25:53 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/30 16:15:56 by zamohame         ###   ########.fr       */
->>>>>>> le-z
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +19,7 @@ class Bot {
 		std::string nickname;
 		std::string username;
 		std::string realname;
+
 	public:
 		Bot();
 		~Bot();
