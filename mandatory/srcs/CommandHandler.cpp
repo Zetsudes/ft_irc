@@ -323,6 +323,8 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 {
 	std::string name = parsedCmd.params[0];
 	Channel* channel = _server.getChannel(name);
+
+	// TODO : VERIFIER SI CE BOUT DE CODE EST OK, RAJOUTER APRES LE MERGE DU-Z
 	if (parsedCmd.params.size() == 1)
 	{
 		if (!channel)

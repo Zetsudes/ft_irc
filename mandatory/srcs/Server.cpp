@@ -179,7 +179,7 @@ void Server::serverLoop()
                         connections[i].events &= ~POLLOUT;
                 }
             }
-            i++; 
+            i++;
         }
     }
 }
@@ -208,59 +208,6 @@ void Server::acceptNewClient()
 		clients.insert(std::make_pair(client_fd, Client(client_fd)));
 		std::cout << "New client connected: " << client_fd << std::endl;
 	}
-}
-
-void Server::readClientMessage(int client_fd)
-{
-	char buffer[1024] = {};
-	int bytesRead = recv(client_fd, buffer, sizeof(buffer), 0);
-	if (bytesRead <= 0)
-	{
-		std::cout << "Client disconnected: " << client_fd << std::endl;
-		close(client_fd);
-		for (size_t i = 0; i < connections.size(); i++)
-		{
-			if (connections[i].fd == client_fd)
-			{
-				connections.erase(connections.begin() + i);
-				break;
-			}
-		}
-		clients.erase(client_fd);
-		return;
-	}
-	 Client* client = getClientByFd(client_fd);
-    if (!client) return;
-
-    client->appendToParseBuffer(std::string(buffer, bytesRead));
-
-    std::string& raw = client->getParseBuffer();
-    std::string::size_type pos;
-    while ((pos = raw.find('\n')) != std::string::npos)
-    {
-        std::string line = raw.substr(0, pos);
-        raw.erase(0, pos + 1);
-
-        if (!line.empty() && line[line.size() - 1] == '\r')
-            line.erase(line.size() - 1);
-        if (line.empty()) continue;
-
-        std::cout << "Received from " << client_fd << ": " << line << std::endl;
-        Parsing parse = Parsing::parse(line);
-        CommandHandler handler(*this, *client);
-        std::string cmd = parse.request;
-        if (cmd == "PASS")       handler.handlePass(parse);
-        else if (cmd == "NICK")  handler.handleNick(parse);
-        else if (cmd == "USER")  handler.handleUser(parse);
-        else if (cmd == "PRIVMSG") handler.handlePrivmsg(parse);
-        else if (cmd == "QUIT")  handler.handleQuit(parse);
-		else if (cmd == "JOIN")  handler.handleJoin(parse);
-		else if (cmd == "PART")  handler.handlePart(parse);
-		else if (cmd == "TOPIC")  handler.handleTopic(parse);
-		else if (cmd == "KICK")  handler.handleKick(parse);
-		else if (cmd == "INVITE")  handler.handleInvite(parse);
-		else if (cmd == "MODE")  handler.handleMode(parse);
-    }
 }
 
 Client* Server::getClientByFd(int fd)

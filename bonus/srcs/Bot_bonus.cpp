@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot_bonus.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pmeimoun <pmeimoun@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 11:26:07 by pmeimoun          #+#    #+#             */
-/*   Updated: 2026/03/24 17:02:28 by zamohame         ###   ########.fr       */
+/*   Updated: 2026/03/30 19:22:12 by pmeimoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ void Bot::run() {
 				if (!response.empty())
 					sendMessage(response + "\r\n");
 			} else if (n < 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
+				// TODO : REGARDER SI ON A LE DROIT
 				throw std::runtime_error("Error: Failed to read from socket");
 			}
 		} catch (const std::exception &e) {
