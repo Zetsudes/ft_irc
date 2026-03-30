@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/CommandHandler_bonus.hpp"
-#include "../include/Server_bonus.hpp"
-#include "../include/Client_bonus.hpp"
-#include "../include/Parsing_bonus.hpp"
-#include "../include/Channel_bonus.hpp"
+#include "../include/CommandHandler.hpp"
+#include "../include/Server.hpp"
+#include "../include/Client.hpp"
+#include "../include/Parsing.hpp"
+#include "../include/Channel.hpp"
 
 CommandHandler::CommandHandler(Server& server, Client& client) : _server(server), _client(client) {};
 CommandHandler::~CommandHandler() {};
@@ -155,6 +155,7 @@ void CommandHandler::handlePrivmsg(const Parsing& parsedCmd)
 	}
 	std::string userDest = parsedCmd.params[0];
 	std::string msg = parsedCmd.params[1];
+
 	if (!userDest.empty() && userDest[0] == '#') {
 		Channel* channel = _server.getChannel(userDest);
 		if (!channel) {
@@ -320,6 +321,37 @@ void	CommandHandler::handleJoin(const Parsing& parsedCmd)
 
 void	CommandHandler::handleMode(const Parsing& parsedCmd)
 {
+	std::string name = parsedCmd.params[0];
+	Channel* channel = _server.getChannel(name);
+	if (parsedCmd.params.size() == 1)
+	{
+		if (!channel)
+		{
+			std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		std::string modes = "+";
+		std::string modeParams;
+		if (channel->isInviteOnly())
+			modes += 'i';
+		if (channel->isTopicRestricted())
+			modes += 't';
+		if (channel->hasKey())
+		{
+			modes += 'k';
+			modeParams += " " + channel->getKey();
+		}
+		if (channel->getUserLimit() != 0)
+		{
+			modes += 'l';
+			std::ostringstream oss;
+			oss << channel->getUserLimit();
+			modeParams += " " + oss.str();
+		}
+		std::string rpl = ":ircserv " + std::string(RPL_CHANNELMODEIS) + " " + _client.getNickname() + " " + name + " " + modes + modeParams + "\r\n";
+		_client.appendToBuffer(rpl);
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -334,8 +366,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
-	std::string name = parsedCmd.params[0];
-	Channel* channel = _server.getChannel(name);
 	if (!channel)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";
@@ -482,16 +512,7 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 			_server.handlePollout(_client);
 			return;
 		}
-<<<<<<< HEAD
-	}
-=======
-<<<<<<<< HEAD:mandatory/srcs/CommandHandler.cpp
-	}	if (_client.isRegistered())
-	_server.sendWelcome(_client);
-========
 	}	
->>>>>>>> le-z:bonus/srcs/CommandHandler_bonus.cpp
->>>>>>> le-z
 	std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost MODE " + name + " " + parsedCmd.params[1];
 	for (size_t k = 2; k < parsedCmd.params.size(); k++)
 		broadcastMsg += " " + parsedCmd.params[k];
@@ -503,11 +524,10 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		_server.handlePollout(**it);
 	}
 }
+}
 
 void	CommandHandler::handleInvite(const Parsing& parsedCmd)
 {
-<<<<<<< HEAD
-=======
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -515,7 +535,6 @@ void	CommandHandler::handleInvite(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
->>>>>>> le-z
 	if (parsedCmd.params.size() <= 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -605,8 +624,6 @@ void	CommandHandler::partChannel(const std::string& name, const std::string& rea
 }
 void	CommandHandler::handlePart(const Parsing& parsedCmd)
 {
-<<<<<<< HEAD
-=======
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -614,7 +631,6 @@ void	CommandHandler::handlePart(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
->>>>>>> le-z
 	if (parsedCmd.params.size() < 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -645,8 +661,6 @@ void	CommandHandler::handlePart(const Parsing& parsedCmd)
 
 void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 {
-<<<<<<< HEAD
-=======
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -654,7 +668,6 @@ void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
->>>>>>> le-z
 	if (parsedCmd.params.size() < 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -716,8 +729,6 @@ void	CommandHandler::handleTopic(const Parsing& parsedCmd)
 
 void	CommandHandler::handleKick(const Parsing& parsedCmd)
 {
-<<<<<<< HEAD
-=======
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -725,7 +736,6 @@ void	CommandHandler::handleKick(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
->>>>>>> le-z
 	if (parsedCmd.params.size() <= 1)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NEEDMOREPARAMS) + " :Not enough parameters <(ꐦㅍ _ㅍ)>\r\n";
@@ -790,16 +800,6 @@ void	CommandHandler::handleKick(const Parsing& parsedCmd)
 
 void	CommandHandler::handleQuit(const Parsing& parsedCmd)
 {
-<<<<<<< HEAD
-	std::string reason;
-	if (parsedCmd.params.empty()) {
-		reason = "Client quit";
-	} else {
-		reason = parsedCmd.params[0];
-	}
-=======
-<<<<<<<< HEAD:mandatory/srcs/CommandHandler.cpp
-========
 	if (!(_client.isRegistered()))
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
@@ -807,14 +807,12 @@ void	CommandHandler::handleQuit(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
->>>>>>>> le-z:bonus/srcs/CommandHandler_bonus.cpp
 	std::string reason;
 	if (parsedCmd.params.empty())
 		reason = "Client quit";
 	else
 		reason = parsedCmd.params[0];
 	std::cout << "Client " << _client.getNickname() << " (fd " << _client.getFd() << ") disconnected: " << reason << std::endl;
->>>>>>> le-z
 	_server.announceQuit(_client, reason);
 	_server.removeClient(_client.getFd());
 }
