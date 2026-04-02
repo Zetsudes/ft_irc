@@ -323,8 +323,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 {
 	std::string name = parsedCmd.params[0];
 	Channel* channel = _server.getChannel(name);
-
-	// TODO : VERIFIER SI CE BOUT DE CODE EST OK, RAJOUTER APRES LE MERGE DU-Z
 	if (parsedCmd.params.size() == 1)
 	{
 		if (!channel)
@@ -354,10 +352,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		}
 		std::string rpl = ":ircserv " + std::string(RPL_CHANNELMODEIS) + " " + _client.getNickname() + " " + name + " " + modes + modeParams + "\r\n";
 		_client.appendToBuffer(rpl);
-	if (!(_client.isRegistered()))
-	{
-		std::string errorMsg = ":ircserv " + std::string(ERR_NOTREGISTERED) + " :You have not registered ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
-		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 		return;
 	}
@@ -368,8 +362,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
 	}
-	std::string name = parsedCmd.params[0];
-	Channel* channel = _server.getChannel(name);
 	if (!channel)
 	{
 		std::string errorMsg = ":ircserv " + std::string(ERR_NOSUCHCHANNEL) + " " + name + " :No such channel ¯\\_(ツ)_/¯\r\n";
@@ -527,7 +519,6 @@ void	CommandHandler::handleMode(const Parsing& parsedCmd)
 		(*it)->appendToBuffer(broadcastMsg);
 		_server.handlePollout(**it);
 	}
-}
 }
 
 void	CommandHandler::handleInvite(const Parsing& parsedCmd)

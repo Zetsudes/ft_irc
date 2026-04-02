@@ -46,7 +46,6 @@
 #define RPL_TOPIC               "332"  // channel topic
 #define RPL_NAMREPLY            "353"  // list of users in channel after JOIN
 #define RPL_ENDOFNAMES          "366"  // end of NAMES list
-// TODO : Verifier son utilite avec le-Z
 #define RPL_CHANNELMODEIS		"324"
 
 class Server;
