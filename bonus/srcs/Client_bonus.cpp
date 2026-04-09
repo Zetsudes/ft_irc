@@ -30,15 +30,9 @@ std::string Client::getUsername() const { return _username; }
 std::string Client::getRealname() const { return _realname; }
 
 //setters
-void Client::setNickname(const std::string& nick) {
-	_nickname = nick;
-	tryRegister();
-}
+void Client::setNickname(const std::string& nick) { _nickname = nick; }
 
-void Client::setUsername(const std::string& user) {
-	_username = user;
-	tryRegister();
-}
+void Client::setUsername(const std::string& user) { _username = user; }
 
 void Client::setPassAccepted(bool accepted) { _passAccepted = accepted; }
 

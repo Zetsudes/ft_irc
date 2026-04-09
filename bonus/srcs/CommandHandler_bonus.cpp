@@ -45,6 +45,8 @@ void	CommandHandler::handlePass(const Parsing& parsedCmd)
 	}
 	else
    		_client.setPassAccepted(true);
+	if (_client.tryRegister())
+        _server.sendWelcome(_client);
 }
 
 void	CommandHandler::handleNick(const Parsing& parsedCmd)
@@ -52,13 +54,6 @@ void	CommandHandler::handleNick(const Parsing& parsedCmd)
 	if (parsedCmd.params.empty())
 	{
 		std::string errorMsg  = ":ircserv " + std::string(ERR_NONICKNAMEGIVEN) + " :No nickname given (╭ರ_•́)\r\n";
-		_client.appendToBuffer(errorMsg);
-		_server.handlePollout(_client);
-		return;
-	}
-	if (_client.isRegistered())
-	{
-		std::string errorMsg = ":ircserv " + std::string(ERR_ALREADYREGISTERED) + " :You may not reregister (≖_≖ )\r\n";
 		_client.appendToBuffer(errorMsg);
 		_server.handlePollout(_client);
 		return;
@@ -105,11 +100,17 @@ void	CommandHandler::handleNick(const Parsing& parsedCmd)
 		_server.handlePollout(_client);
 		return;
     }
+	if (_client.isRegistered())
+    {
+        std::string broadcastMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost NICK " + nickname + "\r\n";
+        _client.appendToBuffer(broadcastMsg);
+        _server.handlePollout(_client);
+        _client.setNickname(nickname);
+        return;
+    }
 	_client.setNickname(nickname);
 	if (_client.tryRegister())
-	{
 		_server.sendWelcome(_client);
-	}
 }
 
 void	CommandHandler::handleUser(const Parsing& parsedCmd)
@@ -135,7 +136,7 @@ void	CommandHandler::handleUser(const Parsing& parsedCmd)
     std::string realname = parsedCmd.params[3];
     _client.setUsername(username);
     _client.setRealname(realname);
-	if (_client.isRegistered())
+	if (_client.tryRegister())
 		_server.sendWelcome(_client);
 }
 
@@ -191,79 +192,74 @@ void CommandHandler::joinChannel(const std::string& name, const std::string& key
 {
 	Channel* channel = _server.getChannel(name);
 	if (channel)
+	{
+		if (channel->isMember(&_client))
+			return;
+		if (channel->isInviteOnly() && !(channel->isInvited(&_client)))
 		{
-			if (channel->isMember(&_client))
-				return;
-			if (channel->isInviteOnly() && !(channel->isInvited(&_client)))
+			std::string errorMsg = ":ircserv " + std::string(ERR_INVITEONLYCHAN) + name + " :Cannot join channel (+i) ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		if (channel->isFull())
+		{
+			std::string errorMsg = ":ircserv " + std::string(ERR_CHANNELISFULL) + name + " :Cannot join channel (+l ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ)\r\n";
+			_client.appendToBuffer(errorMsg);
+			_server.handlePollout(_client);
+			return;
+		}
+		if (channel->hasKey())
+		{
+			if (key.empty() || key != channel->getKey())
 			{
-				std::string errorMsg = ":ircserv " + std::string(ERR_INVITEONLYCHAN) + name + " :Cannot join channel (+i) ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
+				std::string errorMsg = ":ircserv " + std::string(ERR_BADCHANNELKEY) + name + " :Cannot join channel (+k) ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
 				_client.appendToBuffer(errorMsg);
 				_server.handlePollout(_client);
 				return;
 			}
-			if (channel->isFull())
-			{
-				std::string errorMsg = ":ircserv " + std::string(ERR_CHANNELISFULL) + name + " :Cannot join channel (+l ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ)\r\n";
-				_client.appendToBuffer(errorMsg);
-				_server.handlePollout(_client);
-				return;
-			}
-			if (channel->hasKey())
-			{
-				if (key.empty() || key != channel->getKey())
-				{
-					std::string errorMsg = ":ircserv " + std::string(ERR_BADCHANNELKEY) + name + " :Cannot join channel (+k) ⎛⎝( ` ᢍ ´ )⎠⎞ᵐᵘʰᵃʰᵃ\r\n";
-					_client.appendToBuffer(errorMsg);
-					_server.handlePollout(_client);
-					return;
-				}
-			}
-			channel->addClient(&_client);
-			std::string joinMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost JOIN " + name + "\r\n";
-
-			std::string rpl353 = ":ircserv 353 " + _client.getNickname() + " = " + name + " :";
-
-			const std::set<Client*>& members = channel->getMembers();
-			for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
-			{
-				if (channel->isOperator(*it))
-					rpl353 += "@";
-				rpl353 += (*it)->getNickname() + " ";
-			}
-			rpl353 += "\r\n";
-
-			std::string rpl366 = ":ircserv 366 " + _client.getNickname() + " " + name + " :End of /NAMES list\r\n";
-
-			_client.appendToBuffer(joinMsg);
-			_client.appendToBuffer(rpl353);
-			_client.appendToBuffer(rpl366);
-			_server.handlePollout(_client);
 		}
-		else
+		channel->addClient(&_client);
+		std::string joinMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost JOIN " + name + "\r\n";
+
+		const std::set<Client*>& members = channel->getMembers();
+		for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
 		{
-			channel = _server.createChannel(name);
-			channel->addClient(&_client);
-			channel->addOperator(&_client);
-			std::string joinMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost JOIN " + name + "\r\n";
-
-			std::string rpl353 = ":ircserv 353 " + _client.getNickname() + " = " + name + " :";
-
-			const std::set<Client*>& members = channel->getMembers();
-			for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
-			{
-				if (channel->isOperator(*it))
-					rpl353 += "@";
-				rpl353 += (*it)->getNickname() + " ";
-			}
-			rpl353 += "\r\n";
-
-			std::string rpl366 = ":ircserv 366 " + _client.getNickname() + " " + name + " :End of /NAMES list\r\n";
-
-			_client.appendToBuffer(joinMsg);
-			_client.appendToBuffer(rpl353);
-			_client.appendToBuffer(rpl366);
-			_server.handlePollout(_client);
+			(*it)->appendToBuffer(joinMsg);
+			_server.handlePollout(**it);
 		}
+
+		std::string rpl353 = ":ircserv 353 " + _client.getNickname() + " = " + name + " :";
+		for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+		{
+			if (channel->isOperator(*it))
+				rpl353 += "@";
+			rpl353 += (*it)->getNickname() + " ";
+		}
+		rpl353 += "\r\n";
+
+		std::string rpl366 = ":ircserv 366 " + _client.getNickname() + " " + name + " :End of /NAMES list\r\n";
+
+		_client.appendToBuffer(rpl353);
+		_client.appendToBuffer(rpl366);
+		_server.handlePollout(_client);
+	}
+	else
+	{
+		channel = _server.createChannel(name);
+		channel->addClient(&_client);
+		channel->addOperator(&_client);
+
+		std::string joinMsg = ":" + _client.getNickname() + "!" + _client.getUsername() + "@localhost JOIN " + name + "\r\n";
+		_client.appendToBuffer(joinMsg);
+
+		std::string rpl353 = ":ircserv 353 " + _client.getNickname() + " = " + name + " :@" + _client.getNickname() + " \r\n";
+		std::string rpl366 = ":ircserv 366 " + _client.getNickname() + " " + name + " :End of /NAMES list\r\n";
+
+		_client.appendToBuffer(rpl353);
+		_client.appendToBuffer(rpl366);
+		_server.handlePollout(_client);
+	}
 }
 
 void	CommandHandler::handleJoin(const Parsing& parsedCmd)
