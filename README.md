@@ -13,7 +13,9 @@ To use the server, first compile it by running `make`. Then launch it with `./ir
 ### Resources
 ***TimGPT (or tcezard)***
 Better than any AI, he was able to enlighten us about poll(), POLLIN/POLLOUT, communication between server and clients and the kernel amongst many other things. The exchange lasted an hour and not one nanosecond was wasted. His efforts shall not be in vain.
-
+We also used AI tools to help us debug complex issues and better understand certain unexpected behaviors during development.
+We relied on the official IRC documentation to find and correctly implement error codes (such as the 4xx responses) and ensure compliance with the protocol.
+We used Medium articles to deepen our understanding of socket programming and network communication concepts
 
 In ft_irc, the architecture is strictly client–server.
 Each IRC client connects to the IRC server, sends commands, and receives responses. Clients never communicate directly with each other.
